@@ -49,6 +49,7 @@ class PortAttributes(AttributeContainer):
         super(PortAttributes, self).__init__(relative_path, **kwargs)
 
 
+
 class PortChannelAttributes(AttributeContainer):
     PROTOCOL_TYPE = 'Protocol Type'
     PORT_DESCRIPTION = 'Port Description'

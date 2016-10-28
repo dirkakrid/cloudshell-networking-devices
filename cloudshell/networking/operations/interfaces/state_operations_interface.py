@@ -13,5 +13,6 @@ class StateOperationsInterface(object):
     def shutdown(self):
         pass
 
-    def reload(self):
+    @abstractmethod
+    def reload(self, session, logger):
         pass

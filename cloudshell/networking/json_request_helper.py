@@ -1,13 +1,13 @@
 class JsonRequestDeserializer(object):
-    def __init__(self, d):
-        for a, b in d.items():
-            if isinstance(b, dict):
-                setattr(self, a, JsonRequestDeserializer(b))
-            elif isinstance(b, list):
-                items = [self._create_obj_by_type(item) for item in b]
-                setattr(self, a, items)
+    def __init__(self, json):
+        for key, value in json.items():
+            if isinstance(value, dict):
+                setattr(self, key, JsonRequestDeserializer(value))
+            elif isinstance(value, list):
+                items = [self._create_obj_by_type(item) for item in value]
+                setattr(self, key, items)
             else:
-                setattr(self, a, self._create_obj_by_type(b))
+                setattr(self, key, self._create_obj_by_type(value))
 
     @staticmethod
     def _create_obj_by_type(obj):

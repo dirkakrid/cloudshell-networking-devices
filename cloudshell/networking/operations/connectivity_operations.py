@@ -1,16 +1,11 @@
 import traceback
-
 from abc import abstractmethod
-from cloudshell.core.action_result import ActionResult
-from cloudshell.core.driver_response import DriverResponse
-from cloudshell.core.driver_response_root import DriverResponseRoot
+
+import jsonpickle
+
 from cloudshell.networking.apply_connectivity.models.connectivity_request import ConnectivityActionRequest
 from cloudshell.networking.apply_connectivity.models.connectivity_result import ConnectivitySuccessResponse, \
     ConnectivityErrorResponse
-from cloudshell.networking.core.json_request_helper import JsonRequestDeserializer
-from cloudshell.networking.operations.interfaces.connectivity_operations_interface import \
-    ConnectivityOperationsInterface
-import jsonpickle
 
 
 def serialize_connectivity_result(result, unpicklable=False):
@@ -44,8 +39,8 @@ class ConnectivityOperations(object):
         get responce from them and create json response
 
         :param ConnectivityActionRequest action: ConnectivityActionRequest
-        :return ConnectivityActionRequest action_result: Success or Error result
-        :rtype ConnectivityActionResult
+        :return: Success or Error result
+        :rtype: ConnectivityActionResult
         """
 
         self.logger.info('Action: ', action.__dict__)
@@ -77,8 +72,8 @@ class ConnectivityOperations(object):
         get responce from them and create json response
 
         :param ConnectivityActionRequest action: ConnectivityActionRequest
-        :return ConnectivityActionRequest action_result: Success or Error result
-        :rtype ConnectivityActionResult
+        :return: Success or Error result
+        :rtype: ConnectivityActionResult
         """
 
         self.logger.info('Action: ', action.__dict__)

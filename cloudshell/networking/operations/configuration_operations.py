@@ -1,18 +1,19 @@
 import datetime
-import jsonpickle
-
 from abc import abstractmethod
 import re
 
-from posixpath import join
+import jsonpickle
 
-from cloudshell.networking.core.json_request_helper import JsonRequestDeserializer
+from cloudshell.networking.json_request_helper import JsonRequestDeserializer
 from cloudshell.networking.networking_utils import UrlParser
 from cloudshell.networking.operations.interfaces.configuration_operations_interface import \
     ConfigurationOperationsInterface
-from cloudshell.shell.core.context_utils import get_attribute_by_name, decrypt_password
+from cloudshell.shell.core.context_utils import get_attribute_by_name, decrypt_password, get_resource_name, \
+    decrypt_password_from_attribute
 from cloudshell.shell.core.interfaces.save_restore import OrchestrationSaveResult, OrchestrationSavedArtifactInfo, \
     OrchestrationSavedArtifact, OrchestrationRestoreRules
+
+AUTHORIZATION_REQUIRED_STORAGES = ['ftp', 'sftp', 'scp']
 
 
 def _get_snapshot_time_stamp():
@@ -32,26 +33,21 @@ def set_command_result(result, unpicklable=False):
     return result_for_output
 
 
+def _validate_custom_params(custom_params):
+    if not hasattr(custom_params, 'custom_params'):
+        raise Exception('ConfigurationOperations', 'custom_params attribute is empty')
+
+
 class ConfigurationOperations(ConfigurationOperationsInterface):
     REQUIRED_SAVE_ATTRIBUTES_LIST = ['resource_name', ('saved_artifact', 'identifier'),
                                      ('saved_artifact', 'artifact_type'), ('restore_rules', 'requires_same_resource')]
 
-    AUTHORIZATION_REQUIRED_STORAGES = ['ftp', 'sftp', 'scp']
+    def __init__(self, logger, api, context):
+        self._logger = logger
+        self._api = api
 
-    @property
-    @abstractmethod
-    def logger(self):
-        pass
-
-    @property
-    @abstractmethod
-    def resource_name(self):
-        pass
-
-    @property
-    @abstractmethod
-    def api(self):
-        pass
+        self._context = context
+        self._resource_name = get_resource_name(context)
 
     def orchestration_save(self, mode="shallow", custom_params=None):
         """Orchestration Save command
@@ -68,27 +64,13 @@ class ConfigurationOperations(ConfigurationOperationsInterface):
             params = jsonpickle.decode(custom_params)
 
         save_params.update(params.get('custom_params', {}))
-
-        if save_params['folder_path'] and not save_params['folder_path'].endswith('/'):
-            save_params['folder_path'] += '/'
-
         save_params['folder_path'] = self.get_path(save_params['folder_path'])
+        self._logger.info('Start saving configuration')
 
-        url = UrlParser.parse_url(save_params['folder_path'])
-        artifact_type = url[UrlParser.SCHEME].lower()
-
-        self.logger.info('Start saving configuration')
-
-        host = save_params['folder_path'].replace('{}:'.format(artifact_type), '')
-
-        identifier = join(host, self.save(**save_params).strip(','))
-
-        saved_artifact = OrchestrationSavedArtifact(identifier=identifier, artifact_type=artifact_type)
-
-        saved_artifact_info = OrchestrationSavedArtifactInfo(resource_name=self.resource_name,
+        saved_artifact_info = OrchestrationSavedArtifactInfo(resource_name=self._resource_name,
                                                              created_date=_get_snapshot_time_stamp(),
                                                              restore_rules=self.get_restore_rules(),
-                                                             saved_artifact=saved_artifact)
+                                                             saved_artifact=self.save(**save_params))
         save_response = OrchestrationSaveResult(saved_artifacts_info=saved_artifact_info)
         self._validate_artifact_info(saved_artifact_info)
 
@@ -96,9 +78,11 @@ class ConfigurationOperations(ConfigurationOperationsInterface):
 
     def get_path(self, path=''):
         if not path:
-            host = get_attribute_by_name('Backup Location')
+            host = get_attribute_by_name(context=self._context,
+                                         attribute_name='Backup Location')
             if ':' not in host:
-                scheme = get_attribute_by_name('Backup Type')
+                scheme = get_attribute_by_name(context=self._context,
+                                               attribute_name='Backup Type')
                 scheme = re.sub('(:|/+).*$', '', scheme, re.DOTALL)
                 host = re.sub('^/+', '', host)
                 host = '{}://{}'.format(scheme, host)
@@ -108,15 +92,16 @@ class ConfigurationOperations(ConfigurationOperationsInterface):
         if UrlParser.SCHEME not in url or not url[UrlParser.SCHEME]:
             raise Exception('ConfigurationOperations', "Backup Type is wrong or empty")
 
-        if url[UrlParser.SCHEME].lower() in self.AUTHORIZATION_REQUIRED_STORAGES:
+        if url[UrlParser.SCHEME].lower() in AUTHORIZATION_REQUIRED_STORAGES:
             if UrlParser.USERNAME not in url or not url[UrlParser.USERNAME]:
-                url[UrlParser.USERNAME] = get_attribute_by_name('Backup User')
+                url[UrlParser.USERNAME] = get_attribute_by_name(context=self._context, attribute_name='Backup User')
             if UrlParser.PASSWORD not in url or not url[UrlParser.PASSWORD]:
-                url[UrlParser.PASSWORD] = decrypt_password(get_attribute_by_name('Backup Password'))
+                url[UrlParser.PASSWORD] = decrypt_password_from_attribute(api=self._api, context=self._context,
+                                                                          password_attribute_name='Backup Password')
         try:
             result = UrlParser.build_url(url)
         except Exception as e:
-            self.logger.error('Failed to build url: {}'.format(e))
+            self._logger.error('Failed to build url: {}'.format(e))
             raise Exception('ConfigurationOperations', 'Failed to build path url to remote host')
         return result
 
@@ -141,13 +126,13 @@ class ConfigurationOperations(ConfigurationOperationsInterface):
         params = None
         if custom_params:
             params = JsonRequestDeserializer(jsonpickle.decode(custom_params))
-            self._validate_custom_params(params)
+            _validate_custom_params(params)
 
         self._validate_artifact_info(saved_config)
 
         if saved_config.restore_rules.requires_same_resource \
-                and saved_config.resource_name.lower() != self.resource_name.lower():
-            raise Exception('ConfigurationOperations', 'Incompatible resource, expected {}'.format(self.resource_name))
+                and saved_config.resource_name.lower() != self._resource_name.lower():
+            raise Exception('ConfigurationOperations', 'Incompatible resource, expected {}'.format(self._resource_name))
 
         url = self.get_path('{}:{}'.format(saved_config.saved_artifact.artifact_type,
                                            saved_config.saved_artifact.identifier))
@@ -169,9 +154,6 @@ class ConfigurationOperations(ConfigurationOperationsInterface):
         if UrlParser.FILENAME in url and url[UrlParser.FILENAME] and 'startup' in url[UrlParser.FILENAME]:
             restore_params['configuration_type'] = 'startup'
 
-        if 'vrf_management_name' not in restore_params:
-            restore_params['vrf_management_name'] = self._get_resource_attribute(self.resource_name,
-                                                                                 'VRF Management Name')
         restore_params['path'] = url
 
         self.restore(**restore_params)
@@ -200,32 +182,31 @@ class ConfigurationOperations(ConfigurationOperationsInterface):
                             'Mandatory field {0} is missing in Saved Artifact Info request json'.format(
                                 fail_attribute))
 
-    def _validate_custom_params(self, custom_params):
-        if not hasattr(custom_params, 'custom_params'):
-            raise Exception('ConfigurationOperations', 'custom_params attribute is empty')
-
-    def get_restore_rules(self):
-        return OrchestrationRestoreRules(True)
-
-    def _get_resource_attribute(self, resource_name, attribute_name):
-        """Get resource attribute by provided attribute_name
-
-        :param resource_name: resource name or full name
-        :param attribute_name: name of the attribute
-        :return: attribute value
-        :rtype: string
-        """
-
-        try:
-            result = self.api.GetAttributeValue(resource_name, attribute_name).Value
-        except Exception as e:
-            raise Exception(e.message)
-        return result
-
     @abstractmethod
     def save(self, folder_path, configuration_type, vrf_management_name=None):
+        """Backup 'startup-config' or 'running-config' from device to provided file_system [ftp|tftp]
+        Also possible to backup config to localhost
+        :param folder_path:  tftp/ftp server where file be saved
+        :param configuration_type: type of configuration that will be saved (StartUp or Running)
+        :param vrf_management_name: Virtual Routing and Forwarding management name
+        :return: status message / exception
+        :rtype: OrchestrationSavedArtifact
+        """
+
         pass
 
     @abstractmethod
     def restore(self, path, configuration_type, restore_method, vrf_management_name=None):
+        """Restore configuration on device from provided configuration file
+        Restore configuration from local file system or ftp/tftp server into 'running-config' or 'startup-config'.
+        :param path: relative path to the file on the remote host tftp://server/sourcefile
+        :param configuration_type: the configuration type to restore (StartUp or Running)
+        :param restore_method: override current config or not
+        :param vrf_management_name: Virtual Routing and Forwarding management name
+        :return: exception on crash
+        """
+
         pass
+
+    def get_restore_rules(self):
+        return OrchestrationRestoreRules(True)
