@@ -1,7 +1,9 @@
 import threading
 from cloudshell.api.cloudshell_api import CloudShellAPISession
+from cloudshell.cli.cli import CLI
+from cloudshell.cli.session.ssh_session import SSHSession
+from cloudshell.cli.session.telnet_session import TelnetSession
 from cloudshell.snmp.quali_snmp import QualiSnmp
-from cloudshell.cli.cli import Cli
 from cloudshell.cli.session_pool_manager import SessionPoolManager
 from cloudshell.networking.cisco.cisco_command_modes import DefaultActions
 from cloudshell.shell.core.context_utils import CONTEXT_DICT, get_resource_address, get_attribute_by_name, \
@@ -12,7 +14,7 @@ from cloudshell.snmp.snmp_parameters import SNMPV2Parameters, SNMPV3Parameters
 
 def get_cli(session_pool_size, pool_timeout=100):
     session_pool = SessionPoolManager(max_pool_size=session_pool_size, pool_timeout=pool_timeout)
-    return Cli(session_pool=session_pool)
+    return CLI(session_pool=session_pool)
 
 def get_logger(context):
     return LoggingSessionContext.get_logger_for_context(context)
