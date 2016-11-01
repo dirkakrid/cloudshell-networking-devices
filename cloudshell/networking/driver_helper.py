@@ -16,8 +16,23 @@ def get_cli(session_pool_size, pool_timeout=100):
     session_pool = SessionPoolManager(max_pool_size=session_pool_size, pool_timeout=pool_timeout)
     return CLI(session_pool=session_pool)
 
-def get_logger(context):
-    return LoggingSessionContext.get_logger_for_context(context)
+
+def get_logger_with_thread_id(context):
+    """
+    Create QS Logger for command context AutoLoadCommandContext, ResourceCommandContext
+    or ResourceRemoteCommandContext with thread name
+    :param context:
+    :param config:
+    :return:
+    """
+    logger = LoggingSessionContext.get_logger_for_context(context)
+    child = logger.getChild(threading.currentThread().name)
+    for handler in logger.handlers:
+        child.addHandler(handler)
+    child.level = logger.level
+    for log_filter in logger.filters:
+        child.addFilter(log_filter)
+    return child
 
 
 def get_api(context):
