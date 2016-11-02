@@ -6,7 +6,7 @@ from cloudshell.cli.session.telnet_session import TelnetSession
 from cloudshell.snmp.quali_snmp import QualiSnmp
 from cloudshell.cli.session_pool_manager import SessionPoolManager
 from cloudshell.networking.cisco.cisco_command_modes import DefaultActions
-from cloudshell.shell.core.context_utils import CONTEXT_DICT, get_resource_address, get_attribute_by_name, \
+from cloudshell.shell.core.context_utils import _CONTEXT_CONTAINER, get_resource_address, get_attribute_by_name, \
     decrypt_password_from_attribute
 from cloudshell.shell.core.session.logging_session import LoggingSessionContext
 from cloudshell.snmp.snmp_parameters import SNMPV2Parameters, SNMPV3Parameters
@@ -54,7 +54,7 @@ def get_api(context):
 
 def get_cli_connection_attributes(api, context=None):
     if not context:
-        CONTEXT_DICT.get(threading.current_thread(), None)
+        _CONTEXT_CONTAINER.get(threading.current_thread(), None)
     default_actions = DefaultActions(context=context, api=api)
     return {'host': get_resource_address(context),
             'username': get_attribute_by_name(context=context, attribute_name='User'),
@@ -74,14 +74,14 @@ def get_snmp_parameters_from_command_context(command_context):
     if '3' in snmp_version:
         return SNMPV3Parameters(
             ip=ip,
-            snmp_user=get_attribute_by_name(context=command_context, attribute_name='SNMP User'),
-            snmp_password=get_attribute_by_name(context=command_context, attribute_name='SNMP Password'),
-            snmp_private_key=get_attribute_by_name(context=command_context, attribute_name='SNMP Private Key')
+            snmp_user=get_attribute_by_name(context=command_context, attribute_name='SNMP User') or '',
+            snmp_password=get_attribute_by_name(context=command_context, attribute_name='SNMP Password') or '',
+            snmp_private_key=get_attribute_by_name(context=command_context, attribute_name='SNMP Private Key') or ''
         )
     else:
         return SNMPV2Parameters(
             ip=ip,
-            snmp_community=get_attribute_by_name(context=command_context, attribute_name='SNMP Read Community'))
+            snmp_community=get_attribute_by_name(context=command_context, attribute_name='SNMP Read Community')) or ''
 
 def get_snmp_handler(context, logger):
     snmp_handler_params = get_snmp_parameters_from_command_context(context)

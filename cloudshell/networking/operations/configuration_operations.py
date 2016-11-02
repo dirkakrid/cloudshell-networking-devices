@@ -8,7 +8,7 @@ from cloudshell.networking.json_request_helper import JsonRequestDeserializer
 from cloudshell.networking.networking_utils import UrlParser
 from cloudshell.networking.operations.interfaces.configuration_operations_interface import \
     ConfigurationOperationsInterface
-from cloudshell.shell.core.context_utils import get_attribute_by_name, decrypt_password, get_resource_name, \
+from cloudshell.shell.core.context_utils import get_attribute_by_name, get_resource_name, \
     decrypt_password_from_attribute
 from cloudshell.shell.core.interfaces.save_restore import OrchestrationSaveResult, OrchestrationSavedArtifactInfo, \
     OrchestrationSavedArtifact, OrchestrationRestoreRules
@@ -45,7 +45,6 @@ class ConfigurationOperations(ConfigurationOperationsInterface):
     def __init__(self, logger, api, context):
         self._logger = logger
         self._api = api
-
         self._context = context
         self._resource_name = get_resource_name(context)
 
@@ -54,7 +53,7 @@ class ConfigurationOperations(ConfigurationOperationsInterface):
 
         :param mode:
         :param custom_params: json with all required action to configure or remove vlans from certain port
-        :return Serialized DriverResponseRoot to json
+        :return Serialized OrchestrationSavedArtifact to json
         :rtype json
         """
 
@@ -77,6 +76,12 @@ class ConfigurationOperations(ConfigurationOperationsInterface):
         return set_command_result(save_response)
 
     def get_path(self, path=''):
+        """
+        Validates incoming path, if path is not valid, builds it from resource attributes
+
+        :param path: path to remote file storage
+        :return: valid path or :raise Exception:
+        """
         if not path:
             host = get_attribute_by_name(context=self._context,
                                          attribute_name='Backup Location')
@@ -110,8 +115,6 @@ class ConfigurationOperations(ConfigurationOperationsInterface):
 
         :param saved_artifact_info: json with all required data to restore configuration on the device
         :param custom_params: custom parameters
-        :return Serialized DriverResponseRoot to json
-        :rtype json
         """
 
         restore_params = {'configuration_type': 'running'}
@@ -159,8 +162,9 @@ class ConfigurationOperations(ConfigurationOperationsInterface):
         self.restore(**restore_params)
 
     def _validate_artifact_info(self, saved_config):
-        """Validate action from the request json, according to APPLY_CONNECTIVITY_CHANGES_ACTION_REQUIRED_ATTRIBUTE_LIST
+        """Validate OrchestrationSavedArtifactInfo object for key components
 
+        :param OrchestrationSavedArtifactInfo saved_config: object to validate
         """
         is_fail = False
         fail_attribute = ''
@@ -209,4 +213,9 @@ class ConfigurationOperations(ConfigurationOperationsInterface):
         pass
 
     def get_restore_rules(self):
+        """
+        Populate required restore rules.
+
+        :return OrchestrationRestoreRules: response
+        """
         return OrchestrationRestoreRules(True)
