@@ -13,7 +13,7 @@ from cloudshell.shell.core.context_utils import get_attribute_by_name, get_resou
 from cloudshell.shell.core.interfaces.save_restore import OrchestrationSaveResult, OrchestrationSavedArtifactInfo, \
     OrchestrationSavedArtifact, OrchestrationRestoreRules
 
-AUTHORIZATION_REQUIRED_STORAGES = ['ftp', 'sftp', 'scp']
+AUTHORIZATION_REQUIRED_STORAGE = ['ftp', 'sftp', 'scp']
 
 
 def _get_snapshot_time_stamp():
@@ -97,7 +97,7 @@ class ConfigurationOperations(ConfigurationOperationsInterface):
         if UrlParser.SCHEME not in url or not url[UrlParser.SCHEME]:
             raise Exception('ConfigurationOperations', "Backup Type is wrong or empty")
 
-        if url[UrlParser.SCHEME].lower() in AUTHORIZATION_REQUIRED_STORAGES:
+        if url[UrlParser.SCHEME].lower() in AUTHORIZATION_REQUIRED_STORAGE:
             if UrlParser.USERNAME not in url or not url[UrlParser.USERNAME]:
                 url[UrlParser.USERNAME] = get_attribute_by_name(context=self._context, attribute_name='Backup User')
             if UrlParser.PASSWORD not in url or not url[UrlParser.PASSWORD]:

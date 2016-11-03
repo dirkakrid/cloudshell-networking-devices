@@ -20,7 +20,6 @@ def get_logger_with_thread_id(context):
     Create QS Logger for command context AutoLoadCommandContext, ResourceCommandContext
     or ResourceRemoteCommandContext with thread name
     :param context:
-    :param config:
     :return:
     """
     logger = LoggingSessionContext.get_logger_for_context(context)
@@ -34,6 +33,11 @@ def get_logger_with_thread_id(context):
 
 
 def get_api(context):
+    """
+
+    :param context:
+    :return:
+    """
     domain = 'Global'
     if hasattr(context, 'reservation') and hasattr(context.reservation, 'domain'):
         domain = context.reservation.domain
@@ -51,6 +55,12 @@ def get_api(context):
 
 
 def get_cli_connection_attributes(api, context):
+    """
+
+    :param api:
+    :param context:
+    :return:
+    """
     default_actions = DefaultActions(context=context, api=api)
     return {'host': get_resource_address(context),
             'username': get_attribute_by_name(context=context, attribute_name='User'),
@@ -78,6 +88,7 @@ def get_snmp_parameters_from_command_context(command_context):
         return SNMPV2Parameters(
             ip=ip,
             snmp_community=get_attribute_by_name(context=command_context, attribute_name='SNMP Read Community')) or ''
+
 
 def get_snmp_handler(context, logger):
     snmp_handler_params = get_snmp_parameters_from_command_context(context)

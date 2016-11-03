@@ -36,7 +36,7 @@ class ConnectivityOperations(object):
 
     def add_vlan_action(self, action):
         """Handle apply connectivity changes request json, trigger add or remove vlan methods,
-        get responce from them and create json response
+        get response from them and create json response
 
         :param ConnectivityActionRequest action: ConnectivityActionRequest
         :return: Success or Error result
@@ -69,7 +69,7 @@ class ConnectivityOperations(object):
 
     def remove_vlan_action(self, action):
         """Handle apply connectivity changes request json, trigger add or remove vlan methods,
-        get responce from them and create json response
+        get response from them and create json response
 
         :param ConnectivityActionRequest action: ConnectivityActionRequest
         :return: Success or Error result

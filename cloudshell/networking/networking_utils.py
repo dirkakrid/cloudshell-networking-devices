@@ -6,7 +6,7 @@ import socket
 import struct
 import math
 
-from urlparse import urlsplit, urlunsplit, urljoin, SplitResult
+from urlparse import urlsplit, SplitResult
 
 
 def normalizePath(path):
@@ -20,7 +20,7 @@ def normalizePath(path):
     return ret_path
 
 
-ip2int = lambda ipstr: struct.unpack('!I', socket.inet_aton(ipstr))[0]
+ip2int = lambda ip_str: struct.unpack('!I', socket.inet_aton(ip_str))[0]
 int2ip = lambda n: socket.inet_ntoa(struct.pack('!I', n))
 
 
@@ -42,26 +42,27 @@ def isInteger(s):
     return False
 
 
-def normalizeStr(tmpStr):
-    tmpStr = str(tmpStr)
-    tmpStr = tmpStr.replace(' ', '')
-    tmpStr = tmpStr.replace(',', '.')
-    tmpStr = tmpStr.replace('N/A', '')
-    tmpStr = tmpStr.replace('Future', '')
-    tmpStr = tmpStr.replace('', '')
+def normalizeStr(tmp_str):
+    tmp_str = str(tmp_str)
+    tmp_str = tmp_str.replace(' ', '')
+    tmp_str = tmp_str.replace(',', '.')
+    tmp_str = tmp_str.replace('N/A', '')
+    tmp_str = tmp_str.replace('Future', '')
+    tmp_str = tmp_str.replace('', '')
 
-    return tmpStr
+    return tmp_str
 
 
-def getNewIP(ipaddress, wMask):
-    '''Ip calculator to generate masked Ip address from received params
+def getNewIP(ip_address, w_mask):
+    """Ip calculator to generate masked Ip address from received params
 
-    :param ipaddress: ip address to mask
-    :param wMask: wild card mask
+    :param ip_address: ip address to mask
+    :param w_mask: wild card mask
     :return:
-    '''
-    ip_octets = ipaddress.split('.')
-    mask_octets = wMask.split('.')
+    """
+
+    ip_octets = ip_address.split('.')
+    mask_octets = w_mask.split('.')
     new_ip = []
     for i in range(len(ip_octets)):
         new_ip.append(str(int(ip_octets[i]) + int(mask_octets[i])))
@@ -69,11 +70,11 @@ def getNewIP(ipaddress, wMask):
     return '.'.join(new_ip)
 
 
-def validateIP(str):
+def validateIP(string):
     """Validate if provided string matches IPv4 with 4 decimal parts
     """
 
-    octets = str.strip('\"\r').split('.')
+    octets = string.strip('\"\r').split('.')
     if len(octets) != 4:
         return False
 
@@ -98,6 +99,7 @@ def validateVlanNumber(number):
 
 
 def validateVlanRange(vlan_range):
+    result = None
     for vlan in vlan_range.split(','):
         if '-' in vlan:
             for vlan_range_border in vlan.split('-'):
@@ -110,9 +112,9 @@ def validateVlanRange(vlan_range):
 
 
 def validateSpanningTreeType(data):
-    spanningTreeTypes = ['bridge', 'domain', 'lc-issu', 'loopguard', 'mode', 'mst',
+    spanning_tree_types = ['bridge', 'domain', 'lc-issu', 'loopguard', 'mode', 'mst',
                          'pathcost', 'port', 'pseudo-information', 'vlan']
-    if data in spanningTreeTypes:
+    if data in spanning_tree_types:
         return True
     return False
 
@@ -134,10 +136,10 @@ def verifyIpInRange(ip_address, start_addr, end_addr):
     return True
 
 
-def validateMAC(str):
+def validateMAC(str_mac):
     """Validate if provided string matches MAC address pattern
     """
-    return re.match('^([0-9A-F]{2}[:-]){5}([0-9A-F]{2})$', str.upper())
+    return re.match('^([0-9A-F]{2}[:-]){5}([0-9A-F]{2})$', str_mac.upper())
 
 
 def getBroadCastAddress(ip, mask):
@@ -148,11 +150,11 @@ def getBroadCastAddress(ip, mask):
     # return str(network.broadcast())
 
 
-def getIpInfo(ipStr):
+def getIpInfo(ip_str):
     """Get IANA allocation information for the current IP address.
     """
     # fixme need lib
-    # ip = ipcalc.IP(ipStr)
+    # ip = ipcalc.IP(ip_str)
     # return ip.info()
 
 
@@ -167,7 +169,7 @@ def getNetworkAddress(ip, mask):
     """Network slice calculations.
 
     :param ip: network address
-    :param mask: netmask
+    :param mask: net mask
 
     :return networkAddress: string
 
