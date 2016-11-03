@@ -52,5 +52,5 @@ class StateOperations(StateOperationsInterface):
     def shutdown(self):
         pass
 
-    def reload(self, session, logger):
+    def reload(self):
         pass

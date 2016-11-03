@@ -14,5 +14,5 @@ class StateOperationsInterface(object):
         pass
 
     @abstractmethod
-    def reload(self, session, logger):
+    def reload(self):
         pass
