@@ -9,7 +9,7 @@ import math
 from urlparse import urlsplit, SplitResult
 
 
-def normalizePath(path):
+def normalize_path(path):
     """
     :param path:
     :return:
@@ -24,7 +24,7 @@ ip2int = lambda ip_str: struct.unpack('!I', socket.inet_aton(ip_str))[0]
 int2ip = lambda n: socket.inet_ntoa(struct.pack('!I', n))
 
 
-def isInteger(s):
+def is_integer(s):
     try:
         int(s)
         return True
@@ -42,7 +42,7 @@ def isInteger(s):
     return False
 
 
-def normalizeStr(tmp_str):
+def normalize_str(tmp_str):
     tmp_str = str(tmp_str)
     tmp_str = tmp_str.replace(' ', '')
     tmp_str = tmp_str.replace(',', '.')
@@ -53,7 +53,7 @@ def normalizeStr(tmp_str):
     return tmp_str
 
 
-def getNewIP(ip_address, w_mask):
+def get_new_ip(ip_address, w_mask):
     """Ip calculator to generate masked Ip address from received params
 
     :param ip_address: ip address to mask
@@ -70,7 +70,7 @@ def getNewIP(ip_address, w_mask):
     return '.'.join(new_ip)
 
 
-def validateIP(string):
+def validate_ip(string):
     """Validate if provided string matches IPv4 with 4 decimal parts
     """
 
@@ -89,7 +89,7 @@ def validateIP(string):
     return True
 
 
-def validateVlanNumber(number):
+def validate_vlan_number(number):
     try:
         if int(number) > 4000 or int(number) < 1:
             return False
@@ -98,28 +98,28 @@ def validateVlanNumber(number):
     return True
 
 
-def validateVlanRange(vlan_range):
+def validate_vlan_range(vlan_range):
     result = None
     for vlan in vlan_range.split(','):
         if '-' in vlan:
             for vlan_range_border in vlan.split('-'):
-                result = validateVlanNumber(vlan_range_border)
+                result = validate_vlan_number(vlan_range_border)
         else:
-            result = validateVlanNumber(vlan)
+            result = validate_vlan_number(vlan)
         if not result:
             return False
     return True
 
 
-def validateSpanningTreeType(data):
+def validate_spanning_tree_type(data):
     spanning_tree_types = ['bridge', 'domain', 'lc-issu', 'loopguard', 'mode', 'mst',
-                         'pathcost', 'port', 'pseudo-information', 'vlan']
+                           'pathcost', 'port', 'pseudo-information', 'vlan']
     if data in spanning_tree_types:
         return True
     return False
 
 
-def verifyIpInRange(ip_address, start_addr, end_addr):
+def verify_ip_in_range(ip_address, start_addr, end_addr):
     """Validate if provided IP address matches provided network range
 
     :return: True/False
@@ -136,13 +136,13 @@ def verifyIpInRange(ip_address, start_addr, end_addr):
     return True
 
 
-def validateMAC(str_mac):
+def validate_mac(str_mac):
     """Validate if provided string matches MAC address pattern
     """
     return re.match('^([0-9A-F]{2}[:-]){5}([0-9A-F]{2})$', str_mac.upper())
 
 
-def getBroadCastAddress(ip, mask):
+def get_broad_cast_address(ip, mask):
     """Calculate broadcast IP address for provided IP and subnet
     """
     # fixme need lib
@@ -150,7 +150,7 @@ def getBroadCastAddress(ip, mask):
     # return str(network.broadcast())
 
 
-def getIpInfo(ip_str):
+def get_ip_info(ip_str):
     """Get IANA allocation information for the current IP address.
     """
     # fixme need lib
@@ -158,14 +158,14 @@ def getIpInfo(ip_str):
     # return ip.info()
 
 
-def getSubnetCidr(ip, mask):
+def get_subnet_cidr(ip, mask):
     """Get subnet in CIDR format, ex: 255.255.255.0 - 24
     """
     # fixme need lib
     # return ipcalc.Network('{}/{}'.format(ip, mask)).subnet()
 
 
-def getNetworkAddress(ip, mask):
+def get_network_address(ip, mask):
     """Network slice calculations.
 
     :param ip: network address
@@ -179,7 +179,7 @@ def getNetworkAddress(ip, mask):
 
 
 # fixme add comments
-def getMatrixFromString(data_str):
+def get_matrix_from_string(data_str):
     lines = data_str.split('\n')
 
     lines = filter(
@@ -239,7 +239,7 @@ def getMatrixFromString(data_str):
     return data_matrix
 
 
-def shieldString(data_str):
+def shield_string(data_str):
     iter_object = re.finditer('[\{\}\(\)\[\]\|]', data_str)
 
     list_iter = list(iter_object)
@@ -285,7 +285,7 @@ def normalize_buffer(input_buffer):
     return re.sub(r'[\x00-\x08\x0b\x0c\x0e-\x1f\x7f-\xff]', '', result_buffer)
 
 
-def getDictionaryData(source_dictionary, forbidden_keys):
+def get_dictionary_data(source_dictionary, forbidden_keys):
     destination_dictionary = {}
     for key, value in source_dictionary.iteritems():
         if key in forbidden_keys:
@@ -296,7 +296,7 @@ def getDictionaryData(source_dictionary, forbidden_keys):
     return destination_dictionary
 
 
-def getBitSize(bandwidth):
+def get_bit_size(bandwidth):
     bandwidth = bandwidth.lower()
     multiplier = 1
     if re.search('kbit/sec', bandwidth):

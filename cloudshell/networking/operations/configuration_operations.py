@@ -218,4 +218,6 @@ class ConfigurationOperations(ConfigurationOperationsInterface):
 
         :return OrchestrationRestoreRules: response
         """
+
+        self._logger.info('Creating Restore Rules')
         return OrchestrationRestoreRules(True)
