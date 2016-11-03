@@ -1,12 +1,10 @@
 import threading
 from cloudshell.api.cloudshell_api import CloudShellAPISession
 from cloudshell.cli.cli import CLI
-from cloudshell.cli.session.ssh_session import SSHSession
-from cloudshell.cli.session.telnet_session import TelnetSession
 from cloudshell.snmp.quali_snmp import QualiSnmp
 from cloudshell.cli.session_pool_manager import SessionPoolManager
 from cloudshell.networking.cisco.cisco_command_modes import DefaultActions
-from cloudshell.shell.core.context_utils import _CONTEXT_CONTAINER, get_resource_address, get_attribute_by_name, \
+from cloudshell.shell.core.context_utils import get_resource_address, get_attribute_by_name, \
     decrypt_password_from_attribute
 from cloudshell.shell.core.session.logging_session import LoggingSessionContext
 from cloudshell.snmp.snmp_parameters import SNMPV2Parameters, SNMPV3Parameters
@@ -52,9 +50,7 @@ def get_api(context):
     return api
 
 
-def get_cli_connection_attributes(api, context=None):
-    if not context:
-        _CONTEXT_CONTAINER.get(threading.current_thread(), None)
+def get_cli_connection_attributes(api, context):
     default_actions = DefaultActions(context=context, api=api)
     return {'host': get_resource_address(context),
             'username': get_attribute_by_name(context=context, attribute_name='User'),
