@@ -54,20 +54,6 @@ def get_api(context):
     return api
 
 
-def get_cli_connection_attributes(api, context):
-    """
-
-    :param api:
-    :param context:
-    :return:
-    """
-    default_actions = DefaultActions(context=context, api=api)
-    return {'host': get_resource_address(context),
-            'username': get_attribute_by_name(context=context, attribute_name='User'),
-            'password': decrypt_password_from_attribute(api, 'Password', context),
-            'default_actions': default_actions.send_actions}
-
-
 def get_snmp_parameters_from_command_context(command_context):
     """
     :param ResourceCommandContext command_context: command context
