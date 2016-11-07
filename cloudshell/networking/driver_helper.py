@@ -1,5 +1,4 @@
 import threading
-from cloudshell.api.cloudshell_api import CloudShellAPISession
 from cloudshell.cli.cli import CLI
 from cloudshell.shell.core.session.cloudshell_session import CloudShellSessionContext
 from cloudshell.snmp.quali_snmp import QualiSnmp
