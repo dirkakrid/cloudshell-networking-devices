@@ -1,6 +1,7 @@
 import threading
 from cloudshell.api.cloudshell_api import CloudShellAPISession
 from cloudshell.cli.cli import CLI
+from cloudshell.shell.core.session.cloudshell_session import CloudShellSessionContext
 from cloudshell.snmp.quali_snmp import QualiSnmp
 from cloudshell.cli.session_pool_manager import SessionPoolManager
 from cloudshell.shell.core.context_utils import get_attribute_by_name
@@ -36,20 +37,8 @@ def get_api(context):
     :param context:
     :return:
     """
-    domain = 'Global'
-    if hasattr(context, 'reservation') and hasattr(context.reservation, 'domain'):
-        domain = context.reservation.domain
 
-    try:
-        server_address = context.connectivity['server_address']
-        api_port = context.connectivity['cloudshell_api_port']
-        token = context.connectivity['admin_auth_token']
-        api = CloudShellAPISession(server_address, port=api_port, token_id=token, domain=domain)
-    except:
-        # raise ValueError('Connectivity context is empty')
-        api = CloudShellAPISession('localhost', port=8029, username='admin', password='admin', domain=domain)
-
-    return api
+    return CloudShellSessionContext(context).get_api()
 
 
 def get_snmp_parameters_from_command_context(command_context):
