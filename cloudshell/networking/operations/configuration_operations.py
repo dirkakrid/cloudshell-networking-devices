@@ -8,8 +8,8 @@ from cloudshell.networking.json_request_helper import JsonRequestDeserializer
 from cloudshell.networking.networking_utils import UrlParser
 from cloudshell.networking.operations.interfaces.configuration_operations_interface import \
     ConfigurationOperationsInterface
-from cloudshell.shell.core.context_utils import get_attribute_by_name, get_resource_name, \
-    decrypt_password_from_attribute
+from cloudshell.shell.core.api_utils import decrypt_password_from_attribute
+from cloudshell.shell.core.context_utils import get_attribute_by_name, get_resource_name
 from cloudshell.shell.core.interfaces.save_restore import OrchestrationSaveResult, OrchestrationSavedArtifactInfo, \
     OrchestrationSavedArtifact, OrchestrationRestoreRules
 
