@@ -1,5 +1,4 @@
 from abc import abstractmethod
-from cloudshell.networking.cisco.cisco_command_modes import get_session
 from cloudshell.shell.core.context_utils import get_resource_name
 from cloudshell.networking.operations.interfaces.state_operations_interface import StateOperationsInterface
 
@@ -11,7 +10,7 @@ class StateOperations(StateOperationsInterface):
         self._api = api
         self._context = context
         self._resource_name = get_resource_name(context)
-        self._session_type = get_session(self._context, self._api)
+        self._session_type = None
         self._default_mode = None
 
     def health_check(self):
@@ -25,6 +24,9 @@ class StateOperations(StateOperationsInterface):
         self._logger.info('Start health check on {} resource'.format(self._resource_name))
         success = False
         api_response = 'Online'
+        if not self._session_type:
+            raise Exception('StateOperations', 'Health check failed. Unable to get session')
+
         try:
             with self._cli.get_session(new_sessions=self._session_type, command_mode=self._default_mode,
                                        logger=self._logger) as session:
