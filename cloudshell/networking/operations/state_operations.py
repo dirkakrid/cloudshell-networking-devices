@@ -76,7 +76,7 @@ class StateOperations(StateOperationsInterface):
         finally:
             return is_device_down
 
-    def _wait_device_up(self, timeout=10):
+    def _wait_device_up(self, timeout=300):
         """ 
 
         :param timeout (int): during this time device should wake up
@@ -96,6 +96,6 @@ class StateOperations(StateOperationsInterface):
                     self._logger.debug("Device successfully woke up")
                     return True
             except:
-                time.sleep(1)
+                time.sleep(5)
 
         return False
