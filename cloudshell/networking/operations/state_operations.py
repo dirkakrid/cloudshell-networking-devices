@@ -47,7 +47,7 @@ class StateOperations(StateOperationsInterface):
     def shutdown(self):
         pass
 
-    def reload(self):
+    def reload(self, cli_session, sleep_timeout=500):
         pass
 
     def _wait_device_down(self, timeout=10):
