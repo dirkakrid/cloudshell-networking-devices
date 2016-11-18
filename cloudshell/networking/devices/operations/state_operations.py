@@ -3,8 +3,9 @@
 
 import time
 from abc import abstractmethod
+
 from cloudshell.shell.core.context_utils import get_resource_name
-from cloudshell.networking.operations.interfaces.state_operations_interface import StateOperationsInterface
+from cloudshell.networking.devices.operations.interfaces import StateOperationsInterface
 
 
 class StateOperations(StateOperationsInterface):

@@ -5,7 +5,7 @@ import re
 import jsonpickle
 
 from cloudshell.networking.json_request_helper import JsonRequestDeserializer
-from cloudshell.networking.networking_utils import UrlParser
+from cloudshell.networking.devices.networking_utils import UrlParser
 from cloudshell.networking.operations.interfaces.configuration_operations_interface import \
     ConfigurationOperationsInterface
 from cloudshell.shell.core.api_utils import decrypt_password_from_attribute

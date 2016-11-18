@@ -5,7 +5,7 @@ import unittest
 
 from mock import patch, MagicMock as Mock
 
-from cloudshell.networking.operations.state_operations import StateOperations
+from cloudshell.networking.devices.operations import StateOperations
 from cloudshell.shell.core.context import ResourceCommandContext, ReservationContextDetails, ResourceContextDetails
 
 

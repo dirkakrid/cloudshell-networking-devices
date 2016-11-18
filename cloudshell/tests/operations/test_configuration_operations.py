@@ -1,7 +1,9 @@
 from unittest import TestCase
+
 import jsonpickle
 from mock import MagicMock
-from cloudshell.networking.operations.configuration_operations import ConfigurationOperations
+
+from cloudshell.networking.devices.operations.configuration_operations import ConfigurationOperations
 from cloudshell.shell.core.context import ResourceCommandContext, ReservationContextDetails, ResourceContextDetails
 from cloudshell.shell.core.interfaces.save_restore import OrchestrationSavedArtifact
 

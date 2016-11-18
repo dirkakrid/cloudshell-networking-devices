@@ -114,9 +114,9 @@ class ConnectivityOperations(object):
                                 fail_attribute))
 
     @abstractmethod
-    def add_vlan(self, vlan_range, port_list, port_mode, qnq, ctag):
+    def add_vlan(self, vlan_range, port, port_mode, qnq, ctag):
         pass
 
     @abstractmethod
-    def remove_vlan(self, vlan_range, port_list, port_mode):
+    def remove_vlan(self, vlan_range, port, port_mode):
         pass

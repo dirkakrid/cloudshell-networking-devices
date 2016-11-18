@@ -1,5 +1,5 @@
-from cloudshell.networking.autoload.model.generic_resource import GenericResource
-from cloudshell.networking.autoload.networking_attributes import ChassisAttributes, \
+from cloudshell.networking.devices.autoload.model.generic_resource import GenericResource
+from cloudshell.networking.devices.autoload.networking_attributes import ChassisAttributes, \
     PowerPortAttributes, PortAttributes, ModuleAttributes, SubModuleAttributes, PortChannelAttributes, \
     RootAttributes
 from cloudshell.shell.core.driver_context import AutoLoadDetails
