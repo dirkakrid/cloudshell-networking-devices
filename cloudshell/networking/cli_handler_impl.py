@@ -13,11 +13,11 @@ class CliHandlerImpl(CliHandlerInterface):
 
     @property
     def username(self):
-        return get_attribute_by_name('username', self._context)
+        return get_attribute_by_name('User', self._context)
 
     @property
     def password(self):
-        return get_attribute_by_name('password', self._context)
+        return get_attribute_by_name('Password', self._context)
 
     @property
     def resource_address(self):
@@ -25,14 +25,13 @@ class CliHandlerImpl(CliHandlerInterface):
 
     @property
     def port(self):
-        return get_attribute_by_name('port', self._context)
+        return get_attribute_by_name('CLI TCP Port', self._context)
 
     @property
     def cli_type(self):
-        return get_attribute_by_name('CLI_type', self._context)
+        return get_attribute_by_name('CLI Connection Type', self._context)
 
-    @staticmethod
-    def on_session_start(session, logger):
+    def on_session_start(self, session, logger):
         pass
 
     def _ssh_session(self):
@@ -42,9 +41,9 @@ class CliHandlerImpl(CliHandlerInterface):
         return TelnetSession(self.resource_address, self.username, self.password, self.port, self.on_session_start)
 
     def _new_sessions(self):
-        if self.cli_type == SSHSession.SESSION_TYPE.lower():
+        if self.cli_type.lower() == SSHSession.SESSION_TYPE.lower():
             new_sessions = self._ssh_session()
-        elif self.cli_type == TelnetSession.SESSION_TYPE.lower():
+        elif self.cli_type.lower() == TelnetSession.SESSION_TYPE.lower():
             new_sessions = self._telnet_session()
         else:
             new_sessions = [self._ssh_session(), self._telnet_session()]
