@@ -29,6 +29,7 @@ class RestoreConfigurationFlow(object):
             if restore_method == 'running':
                 if configuration == 'override':
                     self._command_actions.override_running(session, path, restore_method, configuration, vrf)
+                    self._command_actions.reload(session)
                 else:
                     self._command_actions.copy(session, path, restore_method, configuration, vrf)
             self._command_actions.verify_applied(session, self._logger)
@@ -43,10 +44,10 @@ class AddVlanFlow(object):
 
     def execute_flow(self, vlan_range, port_mode, port_name, qnq, c_tag):
         self._logger.info(self.__class__.__name__, 'Add Vlan configuration started')
-        with self._cli_handler.get_session() as session:
+        with self._cli_handler.get_session(self._cli_handler.enable_mode) as session:
             self._command_actions.create_vlan(session, self._logger, vlan_range, port_mode, qnq, c_tag)
             self._command_actions.set_vlan_to_interface(session, self._logger, vlan_range, port_mode, port_name, qnq, c_tag)
-            self._command_actions.verfiy(session, vlan_range, port_name)
+            self._command_actions.verify_vlan_added(session, vlan_range, port_name)
             self._logger.info(self.__class__.__name__, 'Add Vlan configuration successfully completed')
             return 'Vlan configuration successfully completed'
 

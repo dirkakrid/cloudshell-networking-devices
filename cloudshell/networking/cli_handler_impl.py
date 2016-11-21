@@ -1,7 +1,10 @@
+from cloudshell.cli.command_mode import CommandMode
 from cloudshell.cli.command_mode_helper import CommandModeHelper
 from cloudshell.cli.session.ssh_session import SSHSession
 from cloudshell.cli.session.telnet_session import TelnetSession
 from cloudshell.networking.cli_handler_interface import CliHandlerInterface
+from cloudshell.networking.devices.driver_helper import get_api
+from cloudshell.shell.core.api_utils import decrypt_password_from_attribute
 from cloudshell.shell.core.context_utils import get_attribute_by_name, get_resource_address
 
 
@@ -10,6 +13,7 @@ class CliHandlerImpl(CliHandlerInterface):
         self._cli = cli
         self._context = context
         self._logger = logger
+        self._api = get_api(context)
 
     @property
     def username(self):
@@ -17,7 +21,7 @@ class CliHandlerImpl(CliHandlerInterface):
 
     @property
     def password(self):
-        return get_attribute_by_name('Password', self._context)
+        return decrypt_password_from_attribute('Password', self._context)
 
     @property
     def resource_address(self):
@@ -49,6 +53,11 @@ class CliHandlerImpl(CliHandlerInterface):
             new_sessions = [self._ssh_session(), self._telnet_session()]
         return new_sessions
 
-    def cli_operations(self, command_mode_type):
-        command_mode = CommandModeHelper.create_command_mode(command_mode_type, self._context)
+    def get_cli_operations(self, command_mode):
+        """
+
+        :param CommandMode command_mode:
+        :return:
+        """
+
         return self._cli.get_session(self._new_sessions(), command_mode, self._logger)
