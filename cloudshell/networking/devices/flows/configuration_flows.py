@@ -1,13 +1,31 @@
+import re
+import time
+from posixpath import join
+
+
 class SaveConfigurationFlow(object):
-    def __init__(self, cli_handler, logger):
+    def __init__(self, cli_handler, logger, resource_name):
         self._cli_handler = cli_handler
         self._logger = logger
         self._mode = None
         self._command_actions = None
+        self._resource_name = resource_name
 
-    def execute_flow(self, path, configuration, vrf):
-        with self._cli_handler.get_session() as session:
-            return self._command_actions.copy(session, self._logger, path, configuration, vrf)
+    def execute_flow(self, folder_path, configuration_type, vrf_management_name=None):
+        system_name = re.sub('\s+', '_', self._resource_name)[:23]
+        time_stamp = time.strftime("%d%m%y-%H%M%S", time.localtime())
+        destination_filename = '{0}-{1}-{2}'.format(system_name, configuration_type.lower(), time_stamp)
+
+        full_path = join(folder_path, destination_filename)
+        action_map = self.prepare_action_map(source_file=configuration_type, destination_file=full_path)
+        with self._cli_handler.get_cli_operations(self._cli_handler.enable_mode) as session:
+            self._command_actions.copy(session, self._logger, configuration_type, full_path,
+                                       vrf_management_name, action_map)
+
+        return destination_filename
+
+    def prepare_action_map(self, destination_file, source_file):
+        pass
 
 
 class RestoreConfigurationFlow(object):

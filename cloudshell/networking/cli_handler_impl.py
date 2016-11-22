@@ -21,7 +21,7 @@ class CliHandlerImpl(CliHandlerInterface):
 
     @property
     def password(self):
-        return decrypt_password_from_attribute('Password', self._context)
+        return decrypt_password_from_attribute(self._api, 'Password', self._context)
 
     @property
     def resource_address(self):

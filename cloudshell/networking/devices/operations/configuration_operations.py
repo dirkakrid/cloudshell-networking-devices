@@ -4,9 +4,9 @@ import re
 
 import jsonpickle
 
-from cloudshell.networking.json_request_helper import JsonRequestDeserializer
+from cloudshell.networking.devices.json_request_helper import JsonRequestDeserializer
 from cloudshell.networking.devices.networking_utils import UrlParser
-from cloudshell.networking.operations.interfaces.configuration_operations_interface import \
+from cloudshell.networking.devices.operations.interfaces.configuration_operations_interface import \
     ConfigurationOperationsInterface
 from cloudshell.shell.core.api_utils import decrypt_password_from_attribute
 from cloudshell.shell.core.context_utils import get_attribute_by_name, get_resource_name
@@ -42,11 +42,12 @@ class ConfigurationOperations(ConfigurationOperationsInterface):
     REQUIRED_SAVE_ATTRIBUTES_LIST = ['resource_name', ('saved_artifact', 'identifier'),
                                      ('saved_artifact', 'artifact_type'), ('restore_rules', 'requires_same_resource')]
 
-    def __init__(self, logger, api, context):
+    def __init__(self, logger, context):
         self._logger = logger
-        self._api = api
+        self._cli_handler = None
         self._context = context
         self._resource_name = get_resource_name(context)
+        self._save_flow = None
 
     def orchestration_save(self, mode="shallow", custom_params=None):
         """Orchestration Save command
@@ -186,7 +187,6 @@ class ConfigurationOperations(ConfigurationOperationsInterface):
                             'Mandatory field {0} is missing in Saved Artifact Info request json'.format(
                                 fail_attribute))
 
-    @abstractmethod
     def save(self, folder_path, configuration_type, vrf_management_name=None):
         """Backup 'startup-config' or 'running-config' from device to provided file_system [ftp|tftp]
         Also possible to backup config to localhost
@@ -197,9 +197,12 @@ class ConfigurationOperations(ConfigurationOperationsInterface):
         :rtype: OrchestrationSavedArtifact
         """
 
-        pass
+        folder_path = self.get_path(folder_path)
+        save_result = self._save_flow.execute_flow(folder_path=folder_path,
+                                                   configuration_type=configuration_type,
+                                                   vrf_management_name=vrf_management_name)
+        return save_result
 
-    @abstractmethod
     def restore(self, path, configuration_type, restore_method, vrf_management_name=None):
         """Restore configuration on device from provided configuration file
         Restore configuration from local file system or ftp/tftp server into 'running-config' or 'startup-config'.
