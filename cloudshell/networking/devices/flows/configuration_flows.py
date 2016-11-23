@@ -1,61 +1,30 @@
-import re
-import time
-from posixpath import join
-from cloudshell.shell.core.interfaces.save_restore import OrchestrationSavedArtifact
+from abc import abstractmethod
 
 
-class SaveConfigurationFlow(object):
-    def __init__(self, cli_handler, logger, resource_name):
-        self._cli_handler = cli_handler
-        self._logger = logger
-        self._mode = None
-        self._command_actions = None
-        self._resource_name = resource_name
-
-    def execute_flow(self, folder_path, configuration_type, vrf_management_name=None):
-        system_name = re.sub('\s+', '_', self._resource_name)[:23]
-        time_stamp = time.strftime("%d%m%y-%H%M%S", time.localtime())
-        destination_filename = '{0}-{1}-{2}'.format(system_name, configuration_type.lower(), time_stamp)
-
-        full_path = join(folder_path, destination_filename)
-        self.save_config(configuration_type=configuration_type,
-                         full_path=full_path,
-                         vrf_management_name=vrf_management_name)
-        artifact_type = full_path.split(':')[0]
-        identifier = full_path.replace("{0}:".format(artifact_type), "")
-        return OrchestrationSavedArtifact(identifier=identifier, artifact_type=artifact_type)
-
-    def save_config(self, configuration_type, full_path, vrf_management_name):
-        pass
-
-
-
-class RestoreConfigurationFlow(object):
+class BaseFlow(object):
     def __init__(self, cli_handler, logger):
         self._cli_handler = cli_handler
         self._logger = logger
-        self._mode = None
         self._command_actions = None
 
-    def execute_flow(self, path, restore_method, configuration, vrf):
-        with self._cli_handler.get_session(self._cli_handler.EnableCommandMode) as session:
-            if configuration == 'startup':
-                if restore_method == 'override':
 
-                    self._command_actions.override_startup(session, path, restore_method, configuration, vrf)
-                else:
-                    self._command_actions.copy(session, path, restore_method, configuration, vrf)
-            
-            if configuration == 'running':
-                if restore_method == 'override':
-                    self._command_actions.override_running(session, path, restore_method, configuration, vrf)
-                    self._command_actions.reload(session)
-                else:
-                    self._command_actions.copy(session, path, restore_method, configuration, vrf)
-            self._command_actions.verify_applied(session, self._logger)
+class SaveConfigurationFlow(BaseFlow):
+    def __init__(self, cli_handler, logger):
+        super(SaveConfigurationFlow, self).__init__(cli_handler, logger)
 
-    def override_startup(self):
+    @abstractmethod
+    def execute_flow(self, folder_path, configuration_type, vrf_management_name=None):
         pass
+
+
+class RestoreConfigurationFlow(BaseFlow):
+    def __init__(self, cli_handler, logger):
+        super(RestoreConfigurationFlow, self).__init__(cli_handler, logger)
+
+    @abstractmethod
+    def execute_flow(self, path, restore_method, configuration, vrf):
+        pass
+
 
 
 class AddVlanFlow(object):

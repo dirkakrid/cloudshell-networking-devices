@@ -1,3 +1,5 @@
+import jsonpickle
+
 __author__ = 'oei'
 
 import os
@@ -310,6 +312,18 @@ def get_bit_size(bandwidth):
 
     return math.log10(bits)
 
+
+def set_command_result(result, unpicklable=False):
+    """Serializes output as JSON and writes it to console output wrapped with special prefix and suffix
+
+    :param result: Result to return
+    :param unpicklable: If True adds JSON can be deserialized as real object.
+                        When False will be deserialized as dictionary
+    """
+
+    json = jsonpickle.encode(result, unpicklable=unpicklable)
+    result_for_output = str(json)
+    return result_for_output
 
 class UrlParser(object):
     SCHEME = 'scheme'

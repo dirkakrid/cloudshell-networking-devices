@@ -1,11 +1,10 @@
-import datetime
-from abc import abstractmethod
 import re
 
-import jsonpickle
+import time
 
+from posixpath import join
 from cloudshell.networking.devices.json_request_helper import JsonRequestDeserializer
-from cloudshell.networking.devices.networking_utils import UrlParser
+from cloudshell.networking.devices.networking_utils import UrlParser, set_command_result
 from cloudshell.networking.devices.operations.interfaces.configuration_operations_interface import \
     ConfigurationOperationsInterface
 from cloudshell.shell.core.api_utils import decrypt_password_from_attribute
@@ -14,23 +13,6 @@ from cloudshell.shell.core.interfaces.save_restore import OrchestrationSaveResul
     OrchestrationSavedArtifact, OrchestrationRestoreRules
 
 AUTHORIZATION_REQUIRED_STORAGE = ['ftp', 'sftp', 'scp']
-
-
-def _get_snapshot_time_stamp():
-    return datetime.datetime.now()
-
-
-def set_command_result(result, unpicklable=False):
-    """Serializes output as JSON and writes it to console output wrapped with special prefix and suffix
-
-    :param result: Result to return
-    :param unpicklable: If True adds JSON can be deserialized as real object.
-                        When False will be deserialized as dictionary
-    """
-
-    json = jsonpickle.encode(result, unpicklable=unpicklable)
-    result_for_output = str(json)
-    return result_for_output
 
 
 def _validate_custom_params(custom_params):
@@ -59,7 +41,7 @@ class ConfigurationOperations(ConfigurationOperationsInterface):
         :rtype json
         """
 
-        save_params = {'folder_path': '', 'configuration_type': 'running'}
+        save_params = {'folder_path': '', 'configuration_type': 'running', 'return_artifact': True}
         params = dict()
         if custom_params:
             params = jsonpickle.decode(custom_params)
@@ -190,7 +172,7 @@ class ConfigurationOperations(ConfigurationOperationsInterface):
                             'Mandatory field {0} is missing in Saved Artifact Info request json'.format(
                                 fail_attribute))
 
-    def save(self, folder_path, configuration_type, vrf_management_name=None):
+    def save(self, folder_path, configuration_type, vrf_management_name=None, return_artifact=False):
         """Backup 'startup-config' or 'running-config' from device to provided file_system [ftp|tftp]
         Also possible to backup config to localhost
         :param folder_path:  tftp/ftp server where file be saved
@@ -201,11 +183,20 @@ class ConfigurationOperations(ConfigurationOperationsInterface):
         """
 
         folder_path = self.get_path(folder_path)
-        save_result = self._save_flow.execute_flow(folder_path=folder_path,
-                                                   configuration_type=configuration_type,
-                                                   vrf_management_name=vrf_management_name)
+        system_name = re.sub('\s+', '_', self._resource_name)[:23]
+        time_stamp = time.strftime("%d%m%y-%H%M%S", time.localtime())
+        destination_filename = '{0}-{1}-{2}'.format(system_name, configuration_type.lower(), time_stamp)
+        full_path = join(folder_path, destination_filename)
+        folder_path = self.get_path(full_path)
+        self._save_flow.execute_flow(folder_path=folder_path,
+                                     configuration_type=configuration_type,
+                                     vrf_management_name=vrf_management_name)
 
-        return save_result.identifier.split('/')[-1]
+        if return_artifact:
+            artifact_type = full_path.split(':')[0]
+            identifier = full_path.replace("{0}:".format(artifact_type), "")
+            return OrchestrationSavedArtifact(identifier=identifier, artifact_type=artifact_type)
+        return destination_filename
 
     def restore(self, path, configuration_type, restore_method, vrf_management_name=None):
         """Restore configuration on device from provided configuration file
@@ -217,7 +208,7 @@ class ConfigurationOperations(ConfigurationOperationsInterface):
         :return: exception on crash
         """
 
-        folder_path = self.get_path(folder_path)
+        folder_path = self.get_path(path)
         save_result = self._save_flow.execute_flow(folder_path=folder_path,
                                                    configuration_type=configuration_type,
                                                    vrf_management_name=vrf_management_name)
