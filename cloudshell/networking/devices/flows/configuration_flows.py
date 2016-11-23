@@ -1,6 +1,7 @@
 import re
 import time
 from posixpath import join
+from cloudshell.shell.core.interfaces.save_restore import OrchestrationSavedArtifact
 
 
 class SaveConfigurationFlow(object):
@@ -22,7 +23,9 @@ class SaveConfigurationFlow(object):
             self._command_actions.copy(session, self._logger, configuration_type, full_path,
                                        vrf_management_name, action_map)
 
-        return destination_filename
+        artifact_type = full_path.split(':')[0]
+        identifier = full_path.replace("{0}:".format(artifact_type), "")
+        return OrchestrationSavedArtifact(identifier=identifier, artifact_type=artifact_type)
 
     def prepare_action_map(self, destination_file, source_file):
         pass

@@ -9,11 +9,11 @@ from cloudshell.shell.core.context_utils import get_attribute_by_name, get_resou
 
 
 class CliHandlerImpl(CliHandlerInterface):
-    def __init__(self, cli, context, logger):
+    def __init__(self, cli, context, logger, api):
         self._cli = cli
         self._context = context
         self._logger = logger
-        self._api = get_api(context)
+        self._api = api
 
     @property
     def username(self):
@@ -21,7 +21,8 @@ class CliHandlerImpl(CliHandlerInterface):
 
     @property
     def password(self):
-        return decrypt_password_from_attribute(self._api, 'Password', self._context)
+        password = get_attribute_by_name(attribute_name='Password', context=self._context)
+        return self._api.DecryptPassword(password).Value
 
     @property
     def resource_address(self):

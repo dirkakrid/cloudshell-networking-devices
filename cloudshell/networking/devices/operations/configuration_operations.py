@@ -42,8 +42,9 @@ class ConfigurationOperations(ConfigurationOperationsInterface):
     REQUIRED_SAVE_ATTRIBUTES_LIST = ['resource_name', ('saved_artifact', 'identifier'),
                                      ('saved_artifact', 'artifact_type'), ('restore_rules', 'requires_same_resource')]
 
-    def __init__(self, logger, context):
+    def __init__(self, logger, context, api):
         self._logger = logger
+        self._api = api
         self._cli_handler = None
         self._context = context
         self._resource_name = get_resource_name(context)
@@ -67,10 +68,12 @@ class ConfigurationOperations(ConfigurationOperationsInterface):
         save_params['folder_path'] = self.get_path(save_params['folder_path'])
         self._logger.info('Start saving configuration')
 
+        saved_artifact = self._save_flow.execute_flow(**save_params)
+
         saved_artifact_info = OrchestrationSavedArtifactInfo(resource_name=self._resource_name,
                                                              created_date=_get_snapshot_time_stamp(),
                                                              restore_rules=self.get_restore_rules(),
-                                                             saved_artifact=self.save(**save_params))
+                                                             saved_artifact=saved_artifact)
         save_response = OrchestrationSaveResult(saved_artifacts_info=saved_artifact_info)
         self._validate_artifact_info(saved_artifact_info)
 
@@ -201,7 +204,8 @@ class ConfigurationOperations(ConfigurationOperationsInterface):
         save_result = self._save_flow.execute_flow(folder_path=folder_path,
                                                    configuration_type=configuration_type,
                                                    vrf_management_name=vrf_management_name)
-        return save_result
+
+        return save_result.identifier.split('/')[-1]
 
     def restore(self, path, configuration_type, restore_method, vrf_management_name=None):
         """Restore configuration on device from provided configuration file
@@ -213,7 +217,12 @@ class ConfigurationOperations(ConfigurationOperationsInterface):
         :return: exception on crash
         """
 
-        pass
+        folder_path = self.get_path(folder_path)
+        save_result = self._save_flow.execute_flow(folder_path=folder_path,
+                                                   configuration_type=configuration_type,
+                                                   vrf_management_name=vrf_management_name)
+
+        return save_result.identifier.split('/')[-1]
 
     def get_restore_rules(self):
         """
