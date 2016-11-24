@@ -99,13 +99,13 @@ class ConnectivityOperations(ConnectivityOperationsInterface):
 
         request_result = []
         for action in holder.driverRequest.actions:
-            result_statuses, message = zip(self.result.get(action.actionId))
+            result_statuses, message = zip(*self.result.get(action.actionId))
             if all(result_statuses):
                 action_result = ConnectivitySuccessResponse(action,
                                                             "Add Vlan {vlan} configuration successfully completed"
                                                             .format(vlan=action.connectionParams.vlanId))
             else:
-                message_details = "\t\n".join(message)
+                message_details = "\n\t".join(message)
                 action_result = ConnectivityErrorResponse(action, "Add Vlan {vlan} configuration failed."
                                                                   "\nAdd Vlan configuration details:\n{message_details}"
                                                           .format(vlan=action.connectionParams.vlanId,
