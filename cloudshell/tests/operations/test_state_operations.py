@@ -5,14 +5,14 @@ import unittest
 
 from mock import patch, MagicMock as Mock
 
-from cloudshell.networking.devices.operations import StateOperations
+from cloudshell.networking.devices.runners import StateOperations
 from cloudshell.shell.core.context import ResourceCommandContext, ReservationContextDetails, ResourceContextDetails
 
 
 class TestStateOperations(unittest.TestCase):
     def setUp(self):
         super(TestStateOperations, self).setUp()
-        with patch("cloudshell.networking.operations.state_operations.StateOperations"):
+        with patch("cloudshell.networking.runners.state_operations.StateOperations"):
             StateOperations.__abstractmethods__ = frozenset()
             api = Mock()
             cli = Mock()
@@ -41,7 +41,7 @@ class TestStateOperations(unittest.TestCase):
         self.tested_instance._cli.get_session.return_value = Exception
         self.assertTrue(self.tested_instance._wait_device_down())
 
-    @patch("cloudshell.networking.operations.state_operations.time.sleep")
+    @patch("cloudshell.networking.runners.state_operations.time.sleep")
     def test__wait_device_down(self, mock_time_sleep):
         session = Mock()
         session.send_command = Mock(side_effect=[Mock(), Mock()])
@@ -50,7 +50,7 @@ class TestStateOperations(unittest.TestCase):
         self.assertTrue(self.tested_instance._wait_device_down())
         self.assertEqual(session.send_command.call_count, 3)
 
-    @patch("cloudshell.networking.operations.state_operations.time.sleep")
+    @patch("cloudshell.networking.runners.state_operations.time.sleep")
     def test__wait_device_down_session_not_closed(self, mock_time_sleep):
         session_context = Mock(__enter__=Mock(return_value=Mock()))
         self.tested_instance._cli.get_session.return_value = session_context
@@ -65,7 +65,7 @@ class TestStateOperations(unittest.TestCase):
         self.tested_instance._cli.get_session.return_value = Exception
         self.assertFalse(self.tested_instance._wait_device_up(timeout=0))
 
-    @patch("cloudshell.networking.operations.state_operations.time.sleep")
+    @patch("cloudshell.networking.runners.state_operations.time.sleep")
     def test__wait_device_up(self, mock_time_sleep):
         session = Mock()
         session.send_command = Mock(side_effect=[Exception, Exception, Mock()])

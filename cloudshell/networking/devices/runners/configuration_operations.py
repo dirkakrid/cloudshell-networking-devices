@@ -7,7 +7,7 @@ import datetime
 import jsonpickle
 from cloudshell.networking.devices.json_request_helper import JsonRequestDeserializer
 from cloudshell.networking.devices.networking_utils import UrlParser, serialize_to_json
-from cloudshell.networking.devices.operations.interfaces.configuration_operations_interface import \
+from cloudshell.networking.devices.runners.interfaces.configuration_operations_interface import \
     ConfigurationOperationsInterface
 from cloudshell.shell.core.api_utils import decrypt_password_from_attribute
 from cloudshell.shell.core.context_utils import get_attribute_by_name, get_resource_name

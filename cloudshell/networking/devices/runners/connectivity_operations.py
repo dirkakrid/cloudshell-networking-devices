@@ -6,7 +6,7 @@ from cloudshell.networking.apply_connectivity.models.connectivity_result import 
     ConnectivitySuccessResponse
 from cloudshell.networking.devices.json_request_helper import JsonRequestDeserializer
 from cloudshell.networking.devices.networking_utils import serialize_to_json
-from cloudshell.networking.devices.operations.interfaces.connectivity_operations_interface import \
+from cloudshell.networking.devices.runners.interfaces.connectivity_operations_interface import \
     ConnectivityOperationsInterface
 
 

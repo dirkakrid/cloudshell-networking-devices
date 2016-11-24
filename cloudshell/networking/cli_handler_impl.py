@@ -15,6 +15,11 @@ class CliHandlerImpl(CliHandlerInterface):
         self._logger = logger
         self._api = api
 
+        #
+        self.enable_mode = None
+        self.config_mode = None
+
+
     @property
     def username(self):
         return get_attribute_by_name('User', self._context)

@@ -1,7 +1,7 @@
 from unittest import TestCase
 from mock import MagicMock
 from cloudshell.networking.apply_connectivity.models.connectivity_result import ConnectivitySuccessResponse
-from cloudshell.networking.devices.operations.connectivity_operations import ConnectivityOperations
+from cloudshell.networking.devices.runners.connectivity_operations import ConnectivityOperations
 from cloudshell.tests.operations.test_connectivity_template import TEST_REQUEST
 
 
