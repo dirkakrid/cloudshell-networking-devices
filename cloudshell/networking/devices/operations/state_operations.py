@@ -9,14 +9,13 @@ from cloudshell.networking.devices.operations.interfaces import StateOperationsI
 
 
 class StateOperations(StateOperationsInterface):
-    def __init__(self, cli, logger, api, context):
-        self._cli = cli
+    def __init__(self, logger, api, context):
+        self._cli_handler = None
         self._logger = logger
         self._api = api
         self._context = context
         self._resource_name = get_resource_name(context)
-        self._session_type = None
-        self._default_mode = None
+        self._health_check_flow = None
 
     def health_check(self):
         """Handle apply connectivity changes request json, trigger add or remove vlan methods,
@@ -30,9 +29,10 @@ class StateOperations(StateOperationsInterface):
         api_response = 'Online'
 
         result = 'Health check on resource {}'.format(self._resource_name)
-        if self._wait_device_up(timeout=1):
+        try:
+            self._health_check_flow.execute_flow(self._cli_handler, self._logger)
             result += ' passed.'
-        else:
+        except Exception:
             api_response = 'Error'
             result += ' failed.'
 

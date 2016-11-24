@@ -1,97 +1,67 @@
-import traceback
-from abc import abstractmethod
-
+from threading import Thread
 import jsonpickle
-
-from cloudshell.networking.apply_connectivity.models.connectivity_request import ConnectivityActionRequest
-from cloudshell.networking.apply_connectivity.models.connectivity_result import ConnectivitySuccessResponse, \
-    ConnectivityErrorResponse
-
-
-def serialize_connectivity_result(result, unpicklable=False):
-    """Serializes output as JSON and writes it to console output wrapped with special prefix and suffix
-
-    :param result: Result to return
-    :param unpicklable: If True adds JSON can be deserialized as real object.
-                        When False will be deserialized as dictionary
-    """
-
-    json = jsonpickle.encode(result, unpicklable=unpicklable)
-    result_for_output = str(json)
-    return result_for_output
+from cloudshell.core.driver_response import DriverResponse
+from cloudshell.core.driver_response_root import DriverResponseRoot
+from cloudshell.networking.apply_connectivity.models.connectivity_result import ConnectivityErrorResponse, \
+    ConnectivitySuccessResponse
+from cloudshell.networking.devices.json_request_helper import JsonRequestDeserializer
+from cloudshell.networking.devices.networking_utils import serialize_to_json
+from cloudshell.networking.devices.operations.interfaces.connectivity_operations_interface import \
+    ConnectivityOperationsInterface
 
 
-class ConnectivityOperations(object):
+class ConnectivityOperations(ConnectivityOperationsInterface):
     APPLY_CONNECTIVITY_CHANGES_ACTION_REQUIRED_ATTRIBUTE_LIST = ['type', 'actionId',
                                                                  ('connectionParams', 'mode'),
                                                                  ('actionTarget', 'fullAddress')]
 
-    def __init__(self):
-        pass
+    def __init__(self, logger):
+        self._logger = logger
+        self.add_vlan_flow = None
+        self.remove_vlan_flow = None
 
-    @property
-    @abstractmethod
-    def logger(self):
-        pass
-
-    def add_vlan_action(self, action):
+    def apply_connectivity_changes(self, request):
         """Handle apply connectivity changes request json, trigger add or remove vlan methods,
-        get response from them and create json response
-
-        :param ConnectivityActionRequest action: ConnectivityActionRequest
-        :return: Success or Error result
-        :rtype: ConnectivityActionResult
+        get responce from them and create json response
+        :param request: json with all required action to configure or remove vlans from certain port
+        :return Serialized DriverResponseRoot to json
+        :rtype json
         """
 
-        self.logger.info('Action: ', action.__dict__)
-        self._validate_request_action(action)
-        try:
-            qnq = False
-            ctag = ''
-            for attribute in action.connectionParams.vlanServiceAttributes:
-                if attribute.attributeName.lower() == 'qnq':
-                    request_qnq = attribute.attributeValue
-                    if request_qnq.lower() == 'true':
-                        qnq = True
-                elif attribute.attributeName.lower() == 'ctag':
-                    ctag = attribute.attributeValue
-            result = self.add_vlan(action.connectionParams.vlanId,
-                                   action.actionTarget.fullName,
-                                   action.connectionParams.mode.lower(),
-                                   qnq,
-                                   ctag)
-            action_result = ConnectivitySuccessResponse(action, result)
-        except Exception as e:
-            self.logger.error('Add vlan failed: {0}'.format(traceback.format_exc()))
-            action_result = ConnectivityErrorResponse(action, ', '.join(map(str, e.args)))
+        if request is None or request == '':
+            raise Exception('ConnectivityOperations', 'request is None or empty')
 
-        return action_result
+        holder = JsonRequestDeserializer(jsonpickle.decode(request))
 
-    def remove_vlan_action(self, action):
-        """Handle apply connectivity changes request json, trigger add or remove vlan methods,
-        get response from them and create json response
+        if not holder or not hasattr(holder, 'driverRequest'):
+            raise Exception('ConnectivityOperations', 'Deserialized request is None or empty')
 
-        :param ConnectivityActionRequest action: ConnectivityActionRequest
-        :return: Success or Error result
-        :rtype: ConnectivityActionResult
-        """
+        driver_response = DriverResponse()
+        add_vlan_thread_list = []
+        remove_vlan_thread_list = []
+        driver_response_root = DriverResponseRoot()
 
-        self.logger.info('Action: ', action.__dict__)
-        self._validate_request_action(action)
-        try:
-            result = self.remove_vlan(action.connectionParams['vlanId'],
-                                      action.actionTarget.fullName,
-                                      action.connectionParams.mode.lower())
-            action_result = ConnectivitySuccessResponse(action, result)
-        except Exception as e:
-            self.logger.error('Remove vlan failed: {0}'.format(traceback.format_exc()))
-            action_result = ConnectivityErrorResponse(action, ', '.join(map(str, e.args)))
-
-        return action_result
+        for action in holder.driverRequest.actions:
+            self._logger.info('Action: ', action.__dict__)
+            self._validate_request_action(action)
+            if action.type == 'removeVlan':
+                remove_vlan_thread = Thread(target=self.remove_vlan, args=(action,))
+                remove_vlan_thread_list.append(remove_vlan_thread)
+                remove_vlan_thread.start()
+            elif action.type == 'setVlan':
+                add_vlan_thread = Thread(target=self.add_vlan, args=(action,))
+                add_vlan_thread_list.append(add_vlan_thread)
+                add_vlan_thread.start()
+            else:
+                continue
+        results = [r.join() for r in remove_vlan_thread_list]
+        results.extend([r.join() for r in add_vlan_thread_list])
+        driver_response.actionResults = results
+        driver_response_root.driverResponse = driver_response
+        return serialize_to_json(driver_response_root).replace('[true]', 'true')
 
     def _validate_request_action(self, action):
         """Validate action from the request json, according to APPLY_CONNECTIVITY_CHANGES_ACTION_REQUIRED_ATTRIBUTE_LIST
-
         """
         is_fail = False
         fail_attribute = ''
@@ -113,10 +83,35 @@ class ConnectivityOperations(object):
                             'Mandatory field {0} is missing in ApplyConnectivityChanges request json'.format(
                                 fail_attribute))
 
-    @abstractmethod
-    def add_vlan(self, vlan_range, port, port_mode, qnq, ctag):
-        pass
+    def _get_port_name(self, action):
+        return action.actionTarget.fullName
 
-    @abstractmethod
-    def remove_vlan(self, vlan_range, port, port_mode):
-        pass
+    def add_vlan(self, action):
+        qnq = False
+        ctag = ''
+        for attribute in action.connectionParams.vlanServiceAttributes:
+            if attribute.attributeName.lower() == 'qnq':
+                request_qnq = attribute.attributeValue
+                if request_qnq.lower() == 'true':
+                    qnq = True
+            elif attribute.attributeName.lower() == 'ctag':
+                ctag = attribute.attributeValue
+        try:
+            action_result = self.add_vlan_flow(self._cli_handler, self._logger)(action.connectionParams.vlanId,
+                                               action.actionTarget.fullName,
+                                               action.connectionParams.mode.lower(),
+                                               qnq,
+                                               ctag)
+            return ConnectivitySuccessResponse(action, action_result)
+        except Exception as e:
+            return ConnectivityErrorResponse(action, e.message)
+
+    def remove_vlan(self, action):
+        try:
+
+            result = self.remove_vlan_flow(action.connectionParams.vlanId,
+                                           action.actionTarget.fullName,
+                                           action.connectionParams.mode.lower())
+            ConnectivitySuccessResponse(action, result)
+        except Exception as e:
+            ConnectivityErrorResponse(action, e.message)

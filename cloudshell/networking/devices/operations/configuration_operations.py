@@ -3,8 +3,10 @@ import re
 import time
 
 from posixpath import join
+import datetime
+import jsonpickle
 from cloudshell.networking.devices.json_request_helper import JsonRequestDeserializer
-from cloudshell.networking.devices.networking_utils import UrlParser, set_command_result
+from cloudshell.networking.devices.networking_utils import UrlParser, serialize_to_json
 from cloudshell.networking.devices.operations.interfaces.configuration_operations_interface import \
     ConfigurationOperationsInterface
 from cloudshell.shell.core.api_utils import decrypt_password_from_attribute
@@ -31,6 +33,7 @@ class ConfigurationOperations(ConfigurationOperationsInterface):
         self._context = context
         self._resource_name = get_resource_name(context)
         self._save_flow = None
+        self._restore_flow = None
 
     def orchestration_save(self, mode="shallow", custom_params=None):
         """Orchestration Save command
@@ -53,13 +56,13 @@ class ConfigurationOperations(ConfigurationOperationsInterface):
         saved_artifact = self._save_flow.execute_flow(**save_params)
 
         saved_artifact_info = OrchestrationSavedArtifactInfo(resource_name=self._resource_name,
-                                                             created_date=_get_snapshot_time_stamp(),
+                                                             created_date=datetime.datetime.now(),
                                                              restore_rules=self.get_restore_rules(),
                                                              saved_artifact=saved_artifact)
         save_response = OrchestrationSaveResult(saved_artifacts_info=saved_artifact_info)
         self._validate_artifact_info(saved_artifact_info)
 
-        return set_command_result(save_response)
+        return serialize_to_json(save_response)
 
     def get_path(self, path=''):
         """
@@ -209,9 +212,9 @@ class ConfigurationOperations(ConfigurationOperationsInterface):
         """
 
         folder_path = self.get_path(path)
-        save_result = self._save_flow.execute_flow(folder_path=folder_path,
-                                                   configuration_type=configuration_type,
-                                                   vrf_management_name=vrf_management_name)
+        save_result = self._restore_flow.execute_flow(folder_path=folder_path,
+                                                      configuration_type=configuration_type,
+                                                      vrf_management_name=vrf_management_name)
 
         return save_result.identifier.split('/')[-1]
 

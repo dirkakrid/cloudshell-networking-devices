@@ -313,7 +313,7 @@ def get_bit_size(bandwidth):
     return math.log10(bits)
 
 
-def set_command_result(result, unpicklable=False):
+def serialize_to_json(result, unpicklable=False):
     """Serializes output as JSON and writes it to console output wrapped with special prefix and suffix
 
     :param result: Result to return
