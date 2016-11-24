@@ -29,7 +29,6 @@ class ConfigurationOperations(ConfigurationOperationsInterface):
     def __init__(self, logger, context, api):
         self._logger = logger
         self._api = api
-        self._cli_handler = None
         self._context = context
         self._resource_name = get_resource_name(context)
         self._save_flow = None
