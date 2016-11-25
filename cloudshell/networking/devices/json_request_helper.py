@@ -1,3 +1,7 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
+
 class JsonRequestDeserializer(object):
     def __init__(self, json):
         for key, value in json.items():

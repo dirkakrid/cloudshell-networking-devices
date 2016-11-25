@@ -1,12 +1,12 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
 import jsonpickle
-
-__author__ = 'oei'
-
+import math
 import os
 import re
 import socket
 import struct
-import math
 
 from urlparse import urlsplit, SplitResult
 
