@@ -1,20 +1,16 @@
-from cloudshell.networking.cisco.cisco_cli_handler import CiscoCliHandler
 from cloudshell.networking.devices.flows.action_flows import RunCommandFlow
 from cloudshell.networking.devices.runners.interfaces.run_command_runner_interface import RunCommandInterface
 
 
 class RunCommandRunner(RunCommandInterface):
-    def __init__(self, cli, context, logger, api):
-        """Create CiscoRunCommandOperations
+    def __init__(self, logger):
+        """Create RunCommandOperations
 
-        :param context: command context
-        :param api: cloudshell api object
-        :param cli: CLI object
         :param logger: QsLogger object
         :return:
         """
 
-        self._cli_handler = CiscoCliHandler(cli, context, logger, api)
+        self._cli_handler = None
         self._logger = logger
         self._run_command_flow = RunCommandFlow(self._cli_handler, self._logger)
 
