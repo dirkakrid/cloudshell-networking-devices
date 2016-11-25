@@ -2,11 +2,11 @@
 # -*- coding: utf-8 -*-
 
 from cloudshell.networking.devices.flows.action_flows import RunCommandFlow
-from cloudshell.networking.devices.runners.interfaces.state_operations_interface import StateOperationsInterface
+from cloudshell.networking.devices.runners.interfaces.state_runner_interface import StateOperationsInterface
 from cloudshell.shell.core.context_utils import get_resource_name
 
 
-class StateOperations(StateOperationsInterface):
+class StateRunner(StateOperationsInterface):
     def __init__(self, logger, api, context):
         self._logger = logger
         self._api = api

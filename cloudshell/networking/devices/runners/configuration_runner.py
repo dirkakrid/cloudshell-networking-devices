@@ -7,7 +7,7 @@ import datetime
 import jsonpickle
 from cloudshell.networking.devices.json_request_helper import JsonRequestDeserializer
 from cloudshell.networking.devices.networking_utils import UrlParser, serialize_to_json
-from cloudshell.networking.devices.runners.interfaces.configuration_operations_interface import \
+from cloudshell.networking.devices.runners.interfaces.configuration_runner_interface import \
     ConfigurationOperationsInterface
 from cloudshell.shell.core.api_utils import decrypt_password_from_attribute
 from cloudshell.shell.core.context_utils import get_attribute_by_name, get_resource_name
@@ -22,7 +22,7 @@ def _validate_custom_params(custom_params):
         raise Exception('ConfigurationOperations', 'custom_params attribute is empty')
 
 
-class ConfigurationOperations(ConfigurationOperationsInterface):
+class ConfigurationRunner(ConfigurationOperationsInterface):
     REQUIRED_SAVE_ATTRIBUTES_LIST = ['resource_name', ('saved_artifact', 'identifier'),
                                      ('saved_artifact', 'artifact_type'), ('restore_rules', 'requires_same_resource')]
 

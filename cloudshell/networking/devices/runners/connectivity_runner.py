@@ -11,11 +11,11 @@ from cloudshell.networking.apply_connectivity.models.connectivity_result import 
     ConnectivitySuccessResponse
 from cloudshell.networking.devices.json_request_helper import JsonRequestDeserializer
 from cloudshell.networking.devices.networking_utils import serialize_to_json, validate_vlan_range, validate_vlan_number
-from cloudshell.networking.devices.runners.interfaces.connectivity_operations_interface import \
+from cloudshell.networking.devices.runners.interfaces.connectivity_runner_interface import \
     ConnectivityOperationsInterface
 
 
-class ConnectivityOperations(ConnectivityOperationsInterface):
+class ConnectivityRunner(ConnectivityOperationsInterface):
     IS_VLAN_RANGE_SUPPORTED = True
     APPLY_CONNECTIVITY_CHANGES_ACTION_REQUIRED_ATTRIBUTE_LIST = ["type", "actionId",
                                                                  ("connectionParams", "mode"),
@@ -114,7 +114,7 @@ class ConnectivityOperations(ConnectivityOperationsInterface):
 
         driver_response.actionResults = request_result
         driver_response_root.driverResponse = driver_response
-        return serialize_to_json(driver_response_root).replace("[true]", "true")
+        return serialize_to_json(driver_response_root)  # .replace("[true]", "true")
 
     def _validate_request_action(self, action):
         """ Validate action from the request json,
@@ -170,7 +170,7 @@ class ConnectivityOperations(ConnectivityOperationsInterface):
                     else:
                         raise Exception(self.__class__.__name__, "Wrong VLANs range detected {}".format(vlan_str))
 
-        return list(result)
+        return map(str, list(result))
 
     def add_vlan(self, vlan_id, full_name, port_mode, qnq, c_tag):
         """ Run flow to add VLAN(s) to interface
