@@ -12,10 +12,11 @@ class RunCommandRunner(RunCommandInterface):
 
         self._cli_handler = None
         self._logger = logger
-        self._run_command_flow = RunCommandFlow(self._cli_handler, self._logger)
 
     def run_custom_command(self, custom_command):
-        return self._run_command_flow.execute_flow(custom_command=custom_command)
+        run_command_flow = RunCommandFlow(self._cli_handler, self._logger)
+        return run_command_flow.execute_flow(custom_command=custom_command)
 
     def run_custom_config_command(self, custom_command):
-        return self._run_command_flow.execute_flow(custom_command=custom_command, is_config=True)
+        run_command_flow = RunCommandFlow(self._cli_handler, self._logger)
+        return run_command_flow.execute_flow(custom_command=custom_command, is_config=True)

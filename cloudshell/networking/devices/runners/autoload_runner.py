@@ -6,7 +6,7 @@ from cloudshell.shell.core.context_utils import get_resource_name, get_attribute
 
 
 class AutoloadRunner(object):
-    def __init__(self, cli, logger, supported_os, context):
+    def __init__(self, cli, logger, context, supported_os):
         """
         Facilitate SNMP autoload,
 

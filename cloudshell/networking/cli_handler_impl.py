@@ -15,11 +15,11 @@ class CliHandlerImpl(CliHandlerInterface):
         self._logger = logger
         self._api = api
 
-        #--------------------------------------------------------
+        # --------------------------------------------------------
         # the modes must be defined to trigger 'RunCustomCommand' as is
         self.enable_mode = None
         self.config_mode = None
-        #--------------------------------------------------------
+        # --------------------------------------------------------
 
     @property
     def username(self):

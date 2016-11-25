@@ -87,8 +87,7 @@ class RunCommandFlow(BaseFlow):
                 raise Exception(self.__class__.__name__,
                                 "CliHandler configuration is missing. Enable Mode has to be defined")
 
-        with self._cli_handler.get_cli_operations(mode) as session:
-            if is_config:
-                for cmd in commands:
-                    responses.append(session.send_command(command=cmd))
+        with self._cli_handler.get_cli_service(mode) as session:
+            for cmd in commands:
+                responses.append(session.send_command(command=cmd))
         return '\n'.join(responses)

@@ -213,12 +213,11 @@ class ConfigurationRunner(ConfigurationOperationsInterface):
         :return: exception on crash
         """
 
-        folder_path = self.get_path(path)
-        save_result = self._restore_flow.execute_flow(folder_path=folder_path,
-                                                      configuration_type=configuration_type,
-                                                      vrf_management_name=vrf_management_name)
-
-        return save_result.identifier.split('/')[-1]
+        path = self.get_path(path)
+        self._restore_flow.execute_flow(path=path,
+                                        configuration_type=configuration_type,
+                                        restore_method=restore_method,
+                                        vrf_management_name=vrf_management_name)
 
     def get_restore_rules(self):
         """
