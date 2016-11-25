@@ -43,4 +43,5 @@ class StateRunner(StateOperationsInterface):
         return result
 
     def shutdown(self):
+        """ Shutdown device """
         pass
