@@ -75,7 +75,7 @@ class RunCommandFlow(BaseFlow):
             mode = self._cli_handler.config_mode
         if not mode:
             raise Exception()
-        with self._cli_handler.get_session(mode) as session:
+        with self._cli_handler.get_cli_operations(mode) as session:
             if is_config:
                 for cmd in commands:
                     responses.append(session.send_command(command=cmd))
