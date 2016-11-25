@@ -1,10 +1,13 @@
-import re
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
 
+import datetime
+import re
 import time
+import jsonpickle
 
 from posixpath import join
-import datetime
-import jsonpickle
+
 from cloudshell.networking.devices.json_request_helper import JsonRequestDeserializer
 from cloudshell.networking.devices.networking_utils import UrlParser, serialize_to_json
 from cloudshell.networking.devices.runners.interfaces.configuration_runner_interface import \

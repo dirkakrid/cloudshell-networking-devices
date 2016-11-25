@@ -1,10 +1,10 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
 from cloudshell.cli.command_mode import CommandMode
-from cloudshell.cli.command_mode_helper import CommandModeHelper
 from cloudshell.cli.session.ssh_session import SSHSession
 from cloudshell.cli.session.telnet_session import TelnetSession
 from cloudshell.networking.cli_handler_interface import CliHandlerInterface
-from cloudshell.networking.devices.driver_helper import get_api
-from cloudshell.shell.core.api_utils import decrypt_password_from_attribute
 from cloudshell.shell.core.context_utils import get_attribute_by_name, get_resource_address
 
 
@@ -15,10 +15,11 @@ class CliHandlerImpl(CliHandlerInterface):
         self._logger = logger
         self._api = api
 
-        #
+        #--------------------------------------------------------
+        # the modes must be defined to trigger 'RunCustomCommand' as is
         self.enable_mode = None
         self.config_mode = None
-
+        #--------------------------------------------------------
 
     @property
     def username(self):
@@ -31,17 +32,35 @@ class CliHandlerImpl(CliHandlerInterface):
 
     @property
     def resource_address(self):
+        """Resource IP
+
+        :return:
+        """
         return get_resource_address(self._context)
 
     @property
     def port(self):
+        """Connection port property, to open socket on
+
+        :return:
+        """
         return get_attribute_by_name('CLI TCP Port', self._context)
 
     @property
     def cli_type(self):
+        """Connection type property [ssh|telnet|console|auto]
+
+        :return:
+        """
         return get_attribute_by_name('CLI Connection Type', self._context)
 
     def on_session_start(self, session, logger):
+        """Perform some default commands when session just opened (like 'no logging console')
+
+        :param session:
+        :param logger:
+        :return:
+        """
         pass
 
     def _ssh_session(self):
@@ -59,11 +78,11 @@ class CliHandlerImpl(CliHandlerInterface):
             new_sessions = [self._ssh_session(), self._telnet_session()]
         return new_sessions
 
-    def get_cli_operations(self, command_mode):
-        """
+    def get_cli_service(self, command_mode):
+        """Use cli.get_session to open CLI connection and switch into required mode
 
-        :param CommandMode command_mode:
-        :return:
+        :param CommandMode command_mode: operation mode, can be default_mode/enable_mode/config_mode/etc.
+        :return: created session in provided mode
         """
 
         return self._cli.get_session(self._new_sessions(), command_mode, self._logger)

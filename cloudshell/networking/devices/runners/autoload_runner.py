@@ -1,4 +1,7 @@
-from cloudshell.networking.devices.driver_helper import get_api, get_snmp_parameters_from_command_context
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
+from cloudshell.networking.devices.driver_helper import get_snmp_parameters_from_command_context
 from cloudshell.shell.core.context_utils import get_resource_name, get_attribute_by_name
 
 

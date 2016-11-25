@@ -1,3 +1,6 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
 from abc import abstractmethod
 
 
@@ -51,17 +54,20 @@ class LoadFirmwareFlow(BaseFlow):
     @abstractmethod
     def execute_flow(self, path, vrf, timeout):
         pass
-        # with self._cli_handler.get_session() as session:
-        #     self._command_actions.install_firmware(session, self._logger, session, path, vrf)
-        #     self._command_actions.reload(session, self._logger, session, timeout)
-        #     self._command_actions.verfiy(session, self._logger, session)
 
 
 class RunCommandFlow(BaseFlow):
     def __init__(self, cli_handler, logger):
         super(RunCommandFlow, self).__init__(cli_handler, logger)
 
-    def execute_flow(self, custom_command='', is_config=False):
+    def execute_flow(self, custom_command="", is_config=False):
+        """ Run custom command
+
+        :param custom_command: command for execution on device
+        :param is_config: if True then run command in configuration mode
+        :return: command execution output
+        """
+
         responses = []
         if isinstance(custom_command, str):
             commands = [custom_command]
@@ -70,11 +76,17 @@ class RunCommandFlow(BaseFlow):
         else:
             commands = custom_command
 
-        mode = self._cli_handler.enable_mode
         if is_config:
             mode = self._cli_handler.config_mode
-        if not mode:
-            raise Exception()
+            if not mode:
+                raise Exception(self.__class__.__name__,
+                                "CliHandler configuration is missing. Config Mode has to be defined")
+        else:
+            mode = self._cli_handler.enable_mode
+            if not mode:
+                raise Exception(self.__class__.__name__,
+                                "CliHandler configuration is missing. Enable Mode has to be defined")
+
         with self._cli_handler.get_cli_operations(mode) as session:
             if is_config:
                 for cmd in commands:

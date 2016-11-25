@@ -2,8 +2,9 @@
 # -*- coding: utf-8 -*-
 
 import jsonpickle
-from threading import Thread, current_thread
+
 from collections import defaultdict
+from threading import Thread, current_thread
 
 from cloudshell.core.driver_response import DriverResponse
 from cloudshell.core.driver_response_root import DriverResponseRoot
