@@ -1,4 +1,5 @@
-
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
 
 from cloudshell.core.logger import qs_logger
 from cloudshell.networking.devices.networking_utils import UrlParser
@@ -34,7 +35,7 @@ class FirmwareRunner(FirmwareRunnerInterface):
         required_keys = [UrlParser.FILENAME, UrlParser.HOSTNAME, UrlParser.SCHEME]
 
         if not url or not all(key in url for key in required_keys):
-            raise Exception('CiscoFirmwareRunner', 'Path is wrong or empty')
+            raise Exception(self.__class__.__name__, "Path is wrong or empty")
 
         self._load_firmware_flow.execute_flow(path, vrf_management_name, self._timeout)
 
