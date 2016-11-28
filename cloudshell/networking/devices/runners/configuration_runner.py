@@ -37,16 +37,17 @@ class ConfigurationRunner(ConfigurationOperationsInterface):
         self._save_flow = None
         self._restore_flow = None
 
-    def save(self, folder_path, configuration_type, vrf_management_name=None, return_artifact=False):
+    def save(self, folder_path='', configuration_type='running', vrf_management_name=None, return_artifact=False):
         """Backup 'startup-config' or 'running-config' from device to provided file_system [ftp|tftp]
         Also possible to backup config to localhost
         :param folder_path:  tftp/ftp server where file be saved
         :param configuration_type: type of configuration that will be saved (StartUp or Running)
         :param vrf_management_name: Virtual Routing and Forwarding management name
         :return: status message / exception
-        :rtype: OrchestrationSavedArtifact
+        :rtype: OrchestrationSavedArtifact or str
         """
 
+        self._validate_configuration_type(configuration_type)
         folder_path = self.get_path(folder_path)
         system_name = re.sub('\s+', '_', self._resource_name)[:23]
         time_stamp = time.strftime("%d%m%y-%H%M%S", time.localtime())
@@ -63,7 +64,7 @@ class ConfigurationRunner(ConfigurationOperationsInterface):
             return OrchestrationSavedArtifact(identifier=identifier, artifact_type=artifact_type)
         return destination_filename
 
-    def restore(self, path, configuration_type, restore_method, vrf_management_name=None):
+    def restore(self, path, configuration_type="running", restore_method="override", vrf_management_name=None):
         """Restore configuration on device from provided configuration file
         Restore configuration from local file system or ftp/tftp server into 'running-config' or 'startup-config'.
         :param path: relative path to the file on the remote host tftp://server/sourcefile
@@ -73,6 +74,7 @@ class ConfigurationRunner(ConfigurationOperationsInterface):
         :return: exception on crash
         """
 
+        self._validate_configuration_type(configuration_type)
         path = self.get_path(path)
         self._restore_flow.execute_flow(path=path,
                                         configuration_type=configuration_type,
@@ -97,7 +99,7 @@ class ConfigurationRunner(ConfigurationOperationsInterface):
         save_params['folder_path'] = self.get_path(save_params['folder_path'])
         self._logger.info('Start saving configuration')
 
-        saved_artifact = self._save_flow.execute_flow(**save_params)
+        saved_artifact = self.save(**save_params)
 
         saved_artifact_info = OrchestrationSavedArtifactInfo(resource_name=self._resource_name,
                                                              created_date=datetime.datetime.now(),
@@ -193,6 +195,16 @@ class ConfigurationRunner(ConfigurationOperationsInterface):
             self._logger.error('Failed to build url: {}'.format(e))
             raise Exception('ConfigurationOperations', 'Failed to build path url to remote host')
         return result
+
+    def _validate_configuration_type(self, configuration_type):
+        """Validate configuration type
+
+        :param configuration_type: configuration_type, should be Startup or Running
+        :raise Exception:
+        """
+
+        if configuration_type.lower() != 'running' and configuration_type.lower() != 'startup':
+            raise Exception(self.__class__.__name__, 'Configuration Type is invalid. Should be startup or running')
 
     def _validate_artifact_info(self, saved_config):
         """Validate OrchestrationSavedArtifactInfo object for key components
