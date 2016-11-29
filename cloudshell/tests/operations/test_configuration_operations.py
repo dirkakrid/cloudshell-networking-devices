@@ -1,7 +1,9 @@
 from unittest import TestCase
+
 import jsonpickle
 from mock import MagicMock
-from cloudshell.networking.operations.configuration_operations import ConfigurationOperations
+
+from cloudshell.networking.devices.runners.configuration_runner import ConfigurationRunner
 from cloudshell.shell.core.context import ResourceCommandContext, ReservationContextDetails, ResourceContextDetails
 from cloudshell.shell.core.interfaces.save_restore import OrchestrationSavedArtifact
 
@@ -19,7 +21,7 @@ class TestConfigurationOperations(TestCase):
         context.resource.attributes = dict()
         context.resource.attributes['CLI Connection Type'] = 'Telnet'
         context.resource.attributes['Sessions Concurrency Limit'] = '1'
-        self.handler = TestConfigurationOperationsImpl(api=api, logger=logger, context=context)
+        self.handler = TestConfigurationRunnerImpl(api=api, logger=logger, context=context)
 
     def test_orchestration_save(self):
         request = """
@@ -64,7 +66,7 @@ class TestConfigurationOperations(TestCase):
         self.handler.orchestration_restore(saved_artifact_info=request)
 
 
-class TestConfigurationOperationsImpl(ConfigurationOperations):
+class TestConfigurationRunnerImpl(ConfigurationRunner):
     def save(self, folder_path, configuration_type, vrf_management_name=None):
         return OrchestrationSavedArtifact(identifier='identifier', artifact_type='test')
 
@@ -72,4 +74,4 @@ class TestConfigurationOperationsImpl(ConfigurationOperations):
         pass
 
     def __init__(self, logger, api, context):
-        super(TestConfigurationOperationsImpl, self).__init__(logger, api, context)
+        super(TestConfigurationRunnerImpl, self).__init__(logger, api, context)

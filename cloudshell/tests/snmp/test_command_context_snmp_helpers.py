@@ -1,8 +1,8 @@
 import unittest
 
 from mock import Mock
-from cloudshell.networking.driver_helper import get_snmp_parameters_from_command_context
 
+from cloudshell.networking.devices.driver_helper import get_snmp_parameters_from_command_context
 from cloudshell.snmp.snmp_parameters import SNMPV2Parameters, SNMPV3Parameters
 
 

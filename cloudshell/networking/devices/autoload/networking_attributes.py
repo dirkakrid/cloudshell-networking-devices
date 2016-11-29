@@ -1,4 +1,4 @@
-from cloudshell.networking.autoload.model.attribute_container import AttributeContainer
+from cloudshell.networking.devices.autoload.model.attribute_container import AttributeContainer
 
 
 class RootAttributes(AttributeContainer):
