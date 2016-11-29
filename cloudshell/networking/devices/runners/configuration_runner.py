@@ -165,11 +165,13 @@ class ConfigurationRunner(ConfigurationOperationsInterface):
 
     def get_path(self, path=''):
         """
-        Validates incoming path, if path is not valid, builds it from resource attributes
+        Validate incoming path, if path is empty, build it from resource attributes,
+        If path is invalid - raise exception
 
         :param path: path to remote file storage
         :return: valid path or :raise Exception:
         """
+
         if not path:
             host = get_attribute_by_name(context=self._context,
                                          attribute_name='Backup Location')

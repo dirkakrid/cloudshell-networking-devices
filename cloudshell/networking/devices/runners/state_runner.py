@@ -16,7 +16,7 @@ class StateRunner(StateOperationsInterface):
         self._health_check_flow = RunCommandFlow(self.cli_handler, logger)
 
     def health_check(self):
-        """ Performs checks on the device that validates that the Shell can work """
+        """ Verify that device is accessible over CLI by sending ENTER for cli session """
 
         self._logger.info('Start health check on {} resource'.format(self._resource_name))
         api_response = 'Online'
