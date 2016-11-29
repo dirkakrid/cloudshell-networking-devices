@@ -142,7 +142,7 @@ class ConnectivityRunner(ConnectivityOperationsInterface):
                                 fail_attribute))
 
     def _get_vlan_list(self, vlan_str):
-        """ Get VLAN list from inputted string
+        """ Get VLAN list from input string
 
         :param vlan_str:
         :return list of VLANs or Exception

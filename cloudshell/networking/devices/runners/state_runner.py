@@ -16,12 +16,7 @@ class StateRunner(StateOperationsInterface):
         self._health_check_flow = RunCommandFlow(self.cli_handler, logger)
 
     def health_check(self):
-        """Handle apply connectivity changes request json, trigger add or remove vlan methods,
-        get response from them and create json response
-
-        :return Serialized DriverResponseRoot to json
-        :rtype json
-        """
+        """ Performs checks on the device that validates that the Shell can work """
 
         self._logger.info('Start health check on {} resource'.format(self._resource_name))
         api_response = 'Online'
