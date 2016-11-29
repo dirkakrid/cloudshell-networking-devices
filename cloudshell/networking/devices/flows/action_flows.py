@@ -24,6 +24,7 @@ class SaveConfigurationFlow(BaseFlow):
         :param vrf_management_name: Virtual Routing and Forwarding Name
         :return: saved configuration file name
         """
+
         pass
 
 
@@ -41,6 +42,7 @@ class RestoreConfigurationFlow(BaseFlow):
         :param configuration_type: the configuration type to restore. Possible values are startup and running
         :param vrf_management_name: Virtual Routing and Forwarding Name
         """
+
         pass
 
 
@@ -59,6 +61,7 @@ class AddVlanFlow(BaseFlow):
         :param c_tag:
         :return:
         """
+
         pass
 
 
@@ -77,6 +80,7 @@ class RemoveVlanFlow(BaseFlow):
         :param error_map:
         :return:
         """
+
         pass
 
 
@@ -86,13 +90,14 @@ class LoadFirmwareFlow(BaseFlow):
 
     @abstractmethod
     def execute_flow(self, path, vrf, timeout):
-        """ Loads a firmware onto the device
+        """Load a firmware onto the device
 
         :param path: The path to the firmware file, including the firmware file name
         :param vrf: Virtual Routing and Forwarding Name
         :param timeout:
         :return:
         """
+
         pass
 
 

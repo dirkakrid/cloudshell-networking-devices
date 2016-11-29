@@ -28,6 +28,7 @@ def _validate_custom_params(custom_params):
 class ConfigurationRunner(ConfigurationOperationsInterface):
     REQUIRED_SAVE_ATTRIBUTES_LIST = ['resource_name', ('saved_artifact', 'identifier'),
                                      ('saved_artifact', 'artifact_type'), ('restore_rules', 'requires_same_resource')]
+    DEFAULT_FILE_SYSTEM = "File System"
 
     def __init__(self, logger, context, api):
         self._logger = logger
@@ -36,6 +37,7 @@ class ConfigurationRunner(ConfigurationOperationsInterface):
         self._resource_name = get_resource_name(context)
         self._save_flow = None
         self._restore_flow = None
+        self.file_system = None
 
     def save(self, folder_path='', configuration_type='running', vrf_management_name=None, return_artifact=False):
         """Backup 'startup-config' or 'running-config' from device to provided file_system [ftp|tftp]
@@ -174,14 +176,14 @@ class ConfigurationRunner(ConfigurationOperationsInterface):
             if ':' not in host:
                 scheme = get_attribute_by_name(context=self._context,
                                                attribute_name='Backup Type')
+                if not scheme or scheme.lower() == self.DEFAULT_FILE_SYSTEM:
+                    scheme = self.file_system
                 scheme = re.sub('(:|/+).*$', '', scheme, re.DOTALL)
                 host = re.sub('^/+', '', host)
                 host = '{}://{}'.format(scheme, host)
             path = host
 
         url = UrlParser.parse_url(path)
-        if UrlParser.SCHEME not in url or not url[UrlParser.SCHEME]:
-            raise Exception('ConfigurationOperations', "Backup Type is wrong or empty")
 
         if url[UrlParser.SCHEME].lower() in AUTHORIZATION_REQUIRED_STORAGE:
             if UrlParser.USERNAME not in url or not url[UrlParser.USERNAME]:
