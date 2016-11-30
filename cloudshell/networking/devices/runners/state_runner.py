@@ -12,8 +12,7 @@ class StateRunner(StateOperationsInterface):
         self._api = api
         self._context = context
         self._resource_name = get_resource_name(context)
-        self.cli_handler = None
-        self._health_check_flow = RunCommandFlow(self.cli_handler, logger)
+        self._cli_handler = None
 
     def health_check(self):
         """ Verify that device is accessible over CLI by sending ENTER for cli session """
@@ -23,7 +22,8 @@ class StateRunner(StateOperationsInterface):
 
         result = 'Health check on resource {}'.format(self._resource_name)
         try:
-            self._health_check_flow.execute_flow()
+            health_check_flow = RunCommandFlow(self._cli_handler, self._logger)
+            health_check_flow.execute_flow()
             result += ' passed.'
         except Exception:
             api_response = 'Error'
