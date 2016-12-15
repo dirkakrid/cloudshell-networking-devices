@@ -1,5 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
+import traceback
 
 import jsonpickle
 
@@ -191,11 +192,12 @@ class ConnectivityRunner(ConnectivityOperationsInterface):
                                                             c_tag=c_tag)
             self.result[current_thread().name].append((True, action_result))
         except Exception as e:
+            self._logger.error(traceback.format_exc())
             self.result[current_thread().name].append((False, e.message))
 
     def remove_vlan(self, vlan_id, full_name, port_mode):
-        """ Run flow to remove VLAN(s) from interface
-
+        """
+        Run flow to remove VLAN(s) from interface
         :param vlan_id: Already validated number of VLAN(s)
         :param full_name: Full interface name. Example: 2950/Chassis 0/FastEthernet0-23
         :param port_mode: port mode type. Should be trunk or access
@@ -208,4 +210,5 @@ class ConnectivityRunner(ConnectivityOperationsInterface):
                                                                port_mode=port_mode)
             self.result[current_thread().name].append((True, action_result))
         except Exception as e:
+            self._logger.error(traceback.format_exc())
             self.result[current_thread().name].append((False, e.message))
