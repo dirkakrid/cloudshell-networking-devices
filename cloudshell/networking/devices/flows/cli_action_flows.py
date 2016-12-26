@@ -2,16 +2,23 @@
 # -*- coding: utf-8 -*-
 
 from abc import abstractmethod
+from cloudshell.networking.cli_handler_impl import CliHandlerImpl
 
 
-class BaseFlow(object):
+class BaseCliFlow(object):
     def __init__(self, cli_handler, logger):
+        """
+        :param cli_handler:
+        :type cli_handler: CliHandlerImpl
+        :param logger:
+        :return:
+        """
         self._cli_handler = cli_handler
         self._logger = logger
         self._command_actions = None
 
 
-class SaveConfigurationFlow(BaseFlow):
+class SaveConfigurationFlow(BaseCliFlow):
     def __init__(self, cli_handler, logger):
         super(SaveConfigurationFlow, self).__init__(cli_handler, logger)
 
@@ -28,7 +35,7 @@ class SaveConfigurationFlow(BaseFlow):
         pass
 
 
-class RestoreConfigurationFlow(BaseFlow):
+class RestoreConfigurationFlow(BaseCliFlow):
     def __init__(self, cli_handler, logger):
         super(RestoreConfigurationFlow, self).__init__(cli_handler, logger)
 
@@ -46,7 +53,7 @@ class RestoreConfigurationFlow(BaseFlow):
         pass
 
 
-class AddVlanFlow(BaseFlow):
+class AddVlanFlow(BaseCliFlow):
     def __init__(self, cli_handler, logger):
         super(AddVlanFlow, self).__init__(cli_handler, logger)
 
@@ -65,7 +72,7 @@ class AddVlanFlow(BaseFlow):
         pass
 
 
-class RemoveVlanFlow(BaseFlow):
+class RemoveVlanFlow(BaseCliFlow):
     def __init__(self, cli_handler, logger):
         super(RemoveVlanFlow, self).__init__(cli_handler, logger)
 
@@ -84,7 +91,7 @@ class RemoveVlanFlow(BaseFlow):
         pass
 
 
-class LoadFirmwareFlow(BaseFlow):
+class LoadFirmwareFlow(BaseCliFlow):
     def __init__(self, cli_handler, logger):
         super(LoadFirmwareFlow, self).__init__(cli_handler, logger)
 
@@ -101,7 +108,7 @@ class LoadFirmwareFlow(BaseFlow):
         pass
 
 
-class RunCommandFlow(BaseFlow):
+class RunCommandFlow(BaseCliFlow):
     def __init__(self, cli_handler, logger):
         super(RunCommandFlow, self).__init__(cli_handler, logger)
 
@@ -136,3 +143,15 @@ class RunCommandFlow(BaseFlow):
             for cmd in commands:
                 responses.append(session.send_command(command=cmd))
         return '\n'.join(responses)
+
+
+class EnableSnmpFlow(BaseCliFlow):
+    @abstractmethod
+    def execute_flow(self, snmp_parameters):
+        pass
+
+
+class DisableSnmpFlow(BaseCliFlow):
+    @abstractmethod
+    def execute_flow(self):
+        pass

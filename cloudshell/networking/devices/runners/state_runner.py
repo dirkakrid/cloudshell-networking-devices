@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-from cloudshell.networking.devices.flows.action_flows import RunCommandFlow
+from cloudshell.networking.devices.flows.cli_action_flows import RunCommandFlow
 from cloudshell.networking.devices.runners.interfaces.state_runner_interface import StateOperationsInterface
 from cloudshell.shell.core.context_utils import get_resource_name
 

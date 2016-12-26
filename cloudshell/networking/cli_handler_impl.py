@@ -1,5 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
+from cloudshell.cli.cli import CLI
+from cloudshell.cli.cli_service_impl import CommandModeContextManager
 
 from cloudshell.cli.command_mode import CommandMode
 from cloudshell.cli.session.ssh_session import SSHSession
@@ -10,6 +12,15 @@ from cloudshell.shell.core.context_utils import get_attribute_by_name, get_resou
 
 class CliHandlerImpl(CliHandlerInterface):
     def __init__(self, cli, context, logger, api):
+        """
+        Helps to create cli handler
+        :param cli:
+        :type cli: CLI
+        :param context:
+        :param logger:
+        :param api:
+        :return:
+        """
         self._cli = cli
         self._context = context
         self._logger = logger
@@ -83,6 +94,6 @@ class CliHandlerImpl(CliHandlerInterface):
 
         :param CommandMode command_mode: operation mode, can be default_mode/enable_mode/config_mode/etc.
         :return: created session in provided mode
+        :rtype: CommandModeContextManager
         """
-
         return self._cli.get_session(self._new_sessions(), command_mode, self._logger)
