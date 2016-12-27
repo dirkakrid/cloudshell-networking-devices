@@ -12,6 +12,7 @@ class RunCommandRunner(RunCommandInterface):
         :param logger: QsLogger object
         """
 
+        # ToDo: use as abstract methods
         self._cli_handler = None
         self._logger = logger
 

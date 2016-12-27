@@ -35,6 +35,7 @@ class ConfigurationRunner(ConfigurationOperationsInterface):
         self._api = api
         self._context = context
         self._resource_name = get_resource_name(context)
+        # ToDo: use as abstract methods
         self._save_flow = None
         self._restore_flow = None
         self.file_system = None

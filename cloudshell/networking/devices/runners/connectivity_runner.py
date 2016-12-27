@@ -25,6 +25,7 @@ class ConnectivityRunner(ConnectivityOperationsInterface):
 
     def __init__(self, logger):
         self._logger = logger
+        # ToDo: use as abstract methods
         self.add_vlan_flow = None
         self.remove_vlan_flow = None
         self.result = defaultdict(list)
@@ -64,7 +65,7 @@ class ConnectivityRunner(ConnectivityOperationsInterface):
                 ctag = ""
                 for attribute in action.connectionParams.vlanServiceAttributes:
                     if attribute.attributeName.lower() == "qnq" and attribute.attributeValue.lower() == "true":
-                            qnq = True
+                        qnq = True
                     if attribute.attributeName.lower() == "ctag":
                         ctag = attribute.attributeValue
 
@@ -167,7 +168,7 @@ class ConnectivityRunner(ConnectivityOperationsInterface):
                     if validate_vlan_number(start) and validate_vlan_number(end):
                         if start > end:
                             start, end = end, start
-                        for vlan in range(start, end+1):
+                        for vlan in range(start, end + 1):
                             result.add(vlan)
                     else:
                         raise Exception(self.__class__.__name__, "Wrong VLANs range detected {}".format(vlan_str))

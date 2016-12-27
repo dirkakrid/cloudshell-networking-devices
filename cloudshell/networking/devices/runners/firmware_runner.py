@@ -13,6 +13,7 @@ class FirmwareRunner(FirmwareRunnerInterface):
         :param qs_logger logger: logger
         """
 
+        # ToDo: use as abstract methods
         self._cli_handler = None
         self._logger = logger
         self._timeout = 500
@@ -38,4 +39,3 @@ class FirmwareRunner(FirmwareRunnerInterface):
             raise Exception(self.__class__.__name__, "Path is wrong or empty")
 
         self._load_firmware_flow.execute_flow(path, vrf_management_name, self._timeout)
-
