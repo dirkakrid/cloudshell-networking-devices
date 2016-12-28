@@ -119,8 +119,6 @@ class ConfigurationRunner(ConfigurationOperationsInterface):
         :param custom_params: custom parameters
         """
 
-        restore_params = {'configuration_type': 'running'}
-
         if saved_artifact_info is None or saved_artifact_info == '':
             raise Exception('ConfigurationOperations', 'saved_artifact_info is None or empty')
 
@@ -139,12 +137,11 @@ class ConfigurationRunner(ConfigurationOperationsInterface):
                 and saved_config.resource_name.lower() != self._resource_name.lower():
             raise Exception('ConfigurationOperations', 'Incompatible resource, expected {}'.format(self._resource_name))
 
-        url = self.get_path('{}:{}'.format(saved_config.saved_artifact.artifact_type,
-                                           saved_config.saved_artifact.identifier))
-
-        restore_params['restore_method'] = 'override'
-        restore_params['configuration_type'] = 'running'
-        restore_params['vrf_management_name'] = None
+        restore_params = {'configuration_type': 'running',
+                          'restore_method': 'override',
+                          'vrf_management_name': None,
+                          'path': '{}:{}'.format(saved_config.saved_artifact.artifact_type,
+                                                 saved_config.saved_artifact.identifier)}
 
         if hasattr(params, 'custom_params'):
             if hasattr(params.custom_params, 'restore_method'):
@@ -156,10 +153,8 @@ class ConfigurationRunner(ConfigurationOperationsInterface):
             if hasattr(params.custom_params, 'vrf_management_name'):
                 restore_params['vrf_management_name'] = params.custom_params.vrf_management_name
 
-        if UrlParser.FILENAME in url and url[UrlParser.FILENAME] and 'startup' in url[UrlParser.FILENAME]:
+        if 'startup' in saved_config.saved_artifact.identifier.split('/')[-1]:
             restore_params['configuration_type'] = 'startup'
-
-        restore_params['path'] = url
 
         self.restore(**restore_params)
 
