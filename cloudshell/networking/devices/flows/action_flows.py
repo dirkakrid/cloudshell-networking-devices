@@ -4,6 +4,7 @@
 from abc import abstractmethod
 
 
+# Deprecated, will be removed
 class BaseFlow(object):
     def __init__(self, cli_handler, logger):
         self._cli_handler = cli_handler

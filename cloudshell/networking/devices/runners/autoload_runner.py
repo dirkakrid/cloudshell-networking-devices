@@ -5,6 +5,7 @@ from cloudshell.networking.devices.driver_helper import get_snmp_parameters_from
 from cloudshell.shell.core.context_utils import get_resource_name, get_attribute_by_name
 
 
+# Deprecated, will be removed, use autoload_runner_new.py
 class AutoloadRunner(object):
     def __init__(self, cli, logger, context, supported_os):
         """

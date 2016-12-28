@@ -12,6 +12,7 @@ class StateRunner(StateOperationsInterface):
         self._api = api
         self._context = context
         self._resource_name = get_resource_name(context)
+        # ToDo: use as abstract methods
         self._cli_handler = None
 
     def health_check(self):
