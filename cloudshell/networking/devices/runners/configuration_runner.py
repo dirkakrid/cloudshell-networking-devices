@@ -174,7 +174,7 @@ class ConfigurationRunner(ConfigurationOperationsInterface):
             if ':' not in host:
                 scheme = get_attribute_by_name(context=self._context,
                                                attribute_name='Backup Type')
-                if not scheme or scheme.lower() == self.DEFAULT_FILE_SYSTEM:
+                if not scheme or scheme.lower() == self.DEFAULT_FILE_SYSTEM.lower():
                     scheme = self.file_system
                 scheme = re.sub('(:|/+).*$', '', scheme, re.DOTALL)
                 host = re.sub('^/+', '', host)
