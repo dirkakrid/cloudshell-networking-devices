@@ -28,7 +28,6 @@ class SubModuleAttributes(AttributeContainer):
 
 
 class PortAttributes(AttributeContainer):
-    PROTOCOL_TYPE = 'Protocol Type'
     PORT_DESCRIPTION = 'Port Description'
     L2_PROTOCOL_TYPE = 'L2 Protocol Type'
     MAC_ADDRESS = 'MAC Address'
@@ -41,7 +40,6 @@ class PortAttributes(AttributeContainer):
     IPV6_ADDRESS = 'IPv6 Address'
 
     def __init__(self, relative_path, **kwargs):
-        self._DEFAULT_VALUES[self.PROTOCOL_TYPE] = 'Transparent'
         self._DEFAULT_VALUES[self.L2_PROTOCOL_TYPE] = 'ethernet'
         self._DEFAULT_VALUES[self.MTU] = 0
         self._DEFAULT_VALUES[self.BANDWIDTH] = 0
@@ -50,14 +48,12 @@ class PortAttributes(AttributeContainer):
 
 
 class PortChannelAttributes(AttributeContainer):
-    PROTOCOL_TYPE = 'Protocol Type'
     PORT_DESCRIPTION = 'Port Description'
     ASSOCIATED_PORTS = 'Associated Ports'
     IPV4_ADDRESS = 'IPv4 Address'
     IPV6_ADDRESS = 'IPv6 Address'
 
     def __init__(self, relative_path, **kwargs):
-        self._DEFAULT_VALUES[self.PROTOCOL_TYPE] = 'Transparent'
         super(PortChannelAttributes, self).__init__(relative_path, **kwargs)
 
 
