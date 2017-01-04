@@ -6,14 +6,13 @@ import jsonpickle
 import re
 import time
 
+from abc import abstractproperty
 from posixpath import join
 
 from cloudshell.networking.devices.json_request_helper import JsonRequestDeserializer
 from cloudshell.networking.devices.networking_utils import UrlParser, serialize_to_json
 from cloudshell.networking.devices.runners.interfaces.configuration_runner_interface import \
     ConfigurationOperationsInterface
-from cloudshell.shell.core.api_utils import decrypt_password_from_attribute
-from cloudshell.shell.core.context_utils import get_attribute_by_name, get_resource_name
 from cloudshell.shell.core.interfaces.save_restore import OrchestrationSaveResult, OrchestrationSavedArtifactInfo, \
     OrchestrationSavedArtifact, OrchestrationRestoreRules
 
@@ -30,15 +29,42 @@ class ConfigurationRunner(ConfigurationOperationsInterface):
                                      ('saved_artifact', 'artifact_type'), ('restore_rules', 'requires_same_resource')]
     DEFAULT_FILE_SYSTEM = "File System"
 
-    def __init__(self, logger, context, api):
+    def __init__(self, logger, resource_config, api):
         self._logger = logger
         self._api = api
-        self._context = context
-        self._resource_name = get_resource_name(context)
-        # ToDo: use as abstract methods
-        self._save_flow = None
-        self._restore_flow = None
-        self.file_system = None
+        self.resource_config = resource_config
+
+    @abstractproperty
+    def cli_handler(self):
+        """ CLI Handler property
+        :return: CLI handler
+        """
+
+        pass
+
+    @abstractproperty
+    def save_flow(self):
+        """ Save flow property
+        :return: SaveFlow object
+        """
+
+        pass
+
+    @abstractproperty
+    def restore_flow(self):
+        """ Restore flow property
+        :return: RestoreFlow object
+        """
+
+        pass
+
+    @abstractproperty
+    def file_system(self):
+        """  Get file system attribute
+        :return: str: file system
+        """
+
+        pass
 
     def save(self, folder_path='', configuration_type='running', vrf_management_name=None, return_artifact=False):
         """Backup 'startup-config' or 'running-config' from device to provided file_system [ftp|tftp]
@@ -52,14 +78,14 @@ class ConfigurationRunner(ConfigurationOperationsInterface):
 
         self._validate_configuration_type(configuration_type)
         folder_path = self.get_path(folder_path)
-        system_name = re.sub('\s+', '_', self._resource_name)[:23]
+        system_name = re.sub('\s+', '_', self.resource_config.name)[:23]
         time_stamp = time.strftime("%d%m%y-%H%M%S", time.localtime())
         destination_filename = '{0}-{1}-{2}'.format(system_name, configuration_type.lower(), time_stamp)
         full_path = join(folder_path, destination_filename)
         folder_path = self.get_path(full_path)
-        self._save_flow.execute_flow(folder_path=folder_path,
-                                     configuration_type=configuration_type,
-                                     vrf_management_name=vrf_management_name)
+        self.save_flow.execute_flow(folder_path=folder_path,
+                                    configuration_type=configuration_type,
+                                    vrf_management_name=vrf_management_name)
 
         if return_artifact:
             artifact_type = full_path.split(':')[0]
@@ -79,10 +105,10 @@ class ConfigurationRunner(ConfigurationOperationsInterface):
 
         self._validate_configuration_type(configuration_type)
         path = self.get_path(path)
-        self._restore_flow.execute_flow(path=path,
-                                        configuration_type=configuration_type,
-                                        restore_method=restore_method,
-                                        vrf_management_name=vrf_management_name)
+        self.restore_flow.execute_flow(path=path,
+                                       configuration_type=configuration_type,
+                                       restore_method=restore_method,
+                                       vrf_management_name=vrf_management_name)
 
     def orchestration_save(self, mode="shallow", custom_params=None):
         """Orchestration Save command
@@ -104,7 +130,7 @@ class ConfigurationRunner(ConfigurationOperationsInterface):
 
         saved_artifact = self.save(**save_params)
 
-        saved_artifact_info = OrchestrationSavedArtifactInfo(resource_name=self._resource_name,
+        saved_artifact_info = OrchestrationSavedArtifactInfo(resource_name=self.resource_config.name,
                                                              created_date=datetime.datetime.now(),
                                                              restore_rules=self.get_restore_rules(),
                                                              saved_artifact=saved_artifact)
@@ -135,8 +161,8 @@ class ConfigurationRunner(ConfigurationOperationsInterface):
         self._validate_artifact_info(saved_config)
 
         if saved_config.restore_rules.requires_same_resource \
-                and saved_config.resource_name.lower() != self._resource_name.lower():
-            raise Exception('ConfigurationOperations', 'Incompatible resource, expected {}'.format(self._resource_name))
+                and saved_config.resource_name.lower() != self.resource_config.name.lower():
+            raise Exception('ConfigurationOperations', 'Incompatible resource, expected {}'.format(self.resource_config.name))
 
         restore_params = {'configuration_type': 'running',
                           'restore_method': 'override',
@@ -169,11 +195,9 @@ class ConfigurationRunner(ConfigurationOperationsInterface):
         """
 
         if not path:
-            host = get_attribute_by_name(context=self._context,
-                                         attribute_name='Backup Location')
+            host = self.resource_config.backup_location
             if ':' not in host:
-                scheme = get_attribute_by_name(context=self._context,
-                                               attribute_name='Backup Type')
+                scheme = self.resource_config.backup_type
                 if not scheme or scheme.lower() == self.DEFAULT_FILE_SYSTEM.lower():
                     scheme = self.file_system
                 scheme = re.sub('(:|/+).*$', '', scheme, re.DOTALL)
@@ -185,10 +209,9 @@ class ConfigurationRunner(ConfigurationOperationsInterface):
 
         if url[UrlParser.SCHEME].lower() in AUTHORIZATION_REQUIRED_STORAGE:
             if UrlParser.USERNAME not in url or not url[UrlParser.USERNAME]:
-                url[UrlParser.USERNAME] = get_attribute_by_name(context=self._context, attribute_name='Backup User')
+                url[UrlParser.USERNAME] = self.resource_config.backup_user
             if UrlParser.PASSWORD not in url or not url[UrlParser.PASSWORD]:
-                url[UrlParser.PASSWORD] = decrypt_password_from_attribute(api=self._api, context=self._context,
-                                                                          password_attribute_name='Backup Password')
+                url[UrlParser.PASSWORD] = self._api.DecryptPassword(self.resource_config.backup_password).Value
         try:
             result = UrlParser.build_url(url)
         except Exception as e:

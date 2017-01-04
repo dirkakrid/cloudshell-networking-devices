@@ -1,19 +1,27 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
+from abc import abstractproperty
+
 from cloudshell.networking.devices.flows.cli_action_flows import RunCommandFlow
 from cloudshell.networking.devices.runners.interfaces.state_runner_interface import StateOperationsInterface
 from cloudshell.shell.core.context_utils import get_resource_name
 
 
 class StateRunner(StateOperationsInterface):
-    def __init__(self, logger, api, context):
+    def __init__(self, logger, api, resource_config):
         self._logger = logger
         self._api = api
-        self._context = context
-        self._resource_name = get_resource_name(context)
-        # ToDo: use as abstract methods
-        self._cli_handler = None
+        self.resource_config = resource_config
+        self._resource_name = self.resource_config.name
+
+    @abstractproperty
+    def cli_handler(self):
+        """ CLI Handler property
+        :return: CLI handler
+        """
+
+        pass
 
     def health_check(self):
         """ Verify that device is accessible over CLI by sending ENTER for cli session """
@@ -23,7 +31,7 @@ class StateRunner(StateOperationsInterface):
 
         result = 'Health check on resource {}'.format(self._resource_name)
         try:
-            health_check_flow = RunCommandFlow(self._cli_handler, self._logger)
+            health_check_flow = RunCommandFlow(self.cli_handler, self._logger)
             health_check_flow.execute_flow()
             result += ' passed.'
         except Exception:

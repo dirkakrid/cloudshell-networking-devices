@@ -44,26 +44,21 @@ def get_api(context):
     return CloudShellSessionContext(context).get_api()
 
 
-def get_snmp_parameters_from_command_context(command_context):
+def get_snmp_parameters_from_command_context(resource_config):
     """
     :param ResourceCommandContext command_context: command context
     :return:
     """
 
-    snmp_version = get_attribute_by_name(context=command_context, attribute_name='SNMP Version')
-    ip = command_context.resource.address
-
-    if '3' in snmp_version:
-        return SNMPV3Parameters(
-            ip=ip,
-            snmp_user=get_attribute_by_name(context=command_context, attribute_name='SNMP User') or '',
-            snmp_password=get_attribute_by_name(context=command_context, attribute_name='SNMP Password') or '',
-            snmp_private_key=get_attribute_by_name(context=command_context, attribute_name='SNMP Private Key') or ''
-        )
+    if '3' in resource_config.snmp_version:
+        return SNMPV3Parameters(ip=resource_config.address,
+                                snmp_user=resource_config.snmp_v3_user or '',
+                                snmp_password=resource_config.snmp_v3_password or '',
+                                snmp_private_key=resource_config.snmp_v3_private_key or ''
+                                )
     else:
-        return SNMPV2Parameters(
-            ip=ip,
-            snmp_community=get_attribute_by_name(context=command_context, attribute_name='SNMP Read Community')) or ''
+        return SNMPV2Parameters(ip=resource_config.address,
+                                snmp_community=resource_config.snmp_read_community or '')
 
 
 def get_snmp_handler(context, logger):

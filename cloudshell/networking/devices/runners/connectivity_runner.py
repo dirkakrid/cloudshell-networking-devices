@@ -1,9 +1,11 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
+
 import traceback
 
 import jsonpickle
 
+from abc import abstractproperty
 from collections import defaultdict
 from threading import Thread, current_thread
 
@@ -25,10 +27,31 @@ class ConnectivityRunner(ConnectivityOperationsInterface):
 
     def __init__(self, logger):
         self._logger = logger
-        # ToDo: use as abstract methods
-        self.add_vlan_flow = None
-        self.remove_vlan_flow = None
         self.result = defaultdict(list)
+
+    @abstractproperty
+    def cli_handler(self):
+        """ CLI Handler property
+        :return: CLI handler
+        """
+
+        pass
+
+    @abstractproperty
+    def add_vlan_flow(self):
+        """ Get Add VLAN flow property
+        :return: AddVLANFlow object
+        """
+
+        pass
+
+    @abstractproperty
+    def remove_vlan_flow(self):
+        """ Remove VLAN flow property
+        :return: RemoveVLANFlow object
+        """
+
+        pass
 
     def apply_connectivity_changes(self, request):
         """ Handle apply connectivity changes request json, trigger add or remove vlan methods,
