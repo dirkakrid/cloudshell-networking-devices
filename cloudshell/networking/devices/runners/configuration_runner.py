@@ -84,7 +84,7 @@ class ConfigurationRunner(ConfigurationOperationsInterface):
         full_path = join(folder_path, destination_filename)
         folder_path = self.get_path(full_path)
         self.save_flow.execute_flow(folder_path=folder_path,
-                                    configuration_type=configuration_type,
+                                    configuration_type=configuration_type.lower(),
                                     vrf_management_name=vrf_management_name)
 
         if return_artifact:
@@ -106,8 +106,8 @@ class ConfigurationRunner(ConfigurationOperationsInterface):
         self._validate_configuration_type(configuration_type)
         path = self.get_path(path)
         self.restore_flow.execute_flow(path=path,
-                                       configuration_type=configuration_type,
-                                       restore_method=restore_method,
+                                       configuration_type=configuration_type.lower(),
+                                       restore_method=restore_method.lower(),
                                        vrf_management_name=vrf_management_name)
 
     def orchestration_save(self, mode="shallow", custom_params=None):
