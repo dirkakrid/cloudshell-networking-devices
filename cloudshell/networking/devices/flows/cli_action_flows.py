@@ -145,6 +145,12 @@ class RunCommandFlow(BaseCliFlow):
         return '\n'.join(responses)
 
 
+class ShutdownFlow(BaseCliFlow):
+    @abstractmethod
+    def execute_flow(self):
+        pass
+
+
 class EnableSnmpFlow(BaseCliFlow):
     @abstractmethod
     def execute_flow(self, snmp_parameters):

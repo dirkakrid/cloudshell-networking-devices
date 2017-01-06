@@ -1,5 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
+from abc import abstractproperty
 
 from cloudshell.networking.devices.flows.cli_action_flows import RunCommandFlow
 from cloudshell.networking.devices.runners.interfaces.state_runner_interface import StateOperationsInterface
@@ -14,6 +15,10 @@ class StateRunner(StateOperationsInterface):
         self._resource_name = get_resource_name(context)
         # ToDo: use as abstract methods
         self._cli_handler = None
+
+    @property
+    def shutdown_flow(self):
+        return None
 
     def health_check(self):
         """ Verify that device is accessible over CLI by sending ENTER for cli session """
@@ -40,4 +45,8 @@ class StateRunner(StateOperationsInterface):
 
     def shutdown(self):
         """ Shutdown device """
-        pass
+        output = None
+        shutdown_flow = self.shutdown_flow
+        if shutdown_flow:
+            output = shutdown_flow.execute_flow()
+        return output
