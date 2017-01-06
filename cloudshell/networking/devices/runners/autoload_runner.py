@@ -7,7 +7,7 @@ from abc import abstractproperty, ABCMeta
 class AutoloadRunner(object):
     __metaclass__ = ABCMeta
 
-    def __init__(self, resource_config, supported_os):
+    def __init__(self, resource_config):
         """
         Facilitate SNMP autoload,
         :param supported_os:
@@ -17,7 +17,6 @@ class AutoloadRunner(object):
         """
 
         self.resource_config = resource_config
-        self._supported_os = supported_os
 
     @abstractproperty
     def autoload_flow(self):
@@ -33,7 +32,7 @@ class AutoloadRunner(object):
 
         :return: AutoLoadDetails object
         """
-        return self.autoload_flow.execute_flow(self._supported_os,
+        return self.autoload_flow.execute_flow(self.resource_config.supported_os,
                                                self.resource_config.shell_name,
                                                self.resource_config.family,
                                                self.resource_config.name)

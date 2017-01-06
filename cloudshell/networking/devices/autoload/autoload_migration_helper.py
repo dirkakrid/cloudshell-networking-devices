@@ -71,3 +71,28 @@ class LegacyUtils(object):
     def __collect_generated_classes(self):
         import sys, inspect
         return inspect.getmembers(sys.modules[__name__], inspect.isclass)
+
+
+def migrate_autoload_details(autoload_details, shell_name, shell_type):
+    """ Migrate autoload details. Add namespace for attributes
+
+    :param autoload_details:
+    :param shell_name:
+    :param shell_type:
+    :return:
+    """
+
+    mapping = {resource.relative_address: resource.model for resource in autoload_details.resources}
+
+    for attribute in autoload_details.attributes:
+
+        if not attribute.relative_address:  # Root element
+            if attribute.attribute_name == "Contact Name":
+                attribute.attribute_name = ".".join([shell_name, attribute.attribute_name])
+            else:
+                attribute.attribute_name = ".".join([shell_type, attribute.attribute_name])
+        else:
+            attribute.attribute_name = ".".join(
+                [shell_name, mapping[attribute.relative_address], attribute.attribute_name])
+
+    return autoload_details

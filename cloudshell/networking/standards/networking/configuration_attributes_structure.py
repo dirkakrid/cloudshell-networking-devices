@@ -3,16 +3,28 @@
 
 
 class GenericNetworkingResource(object):
-    def __init__(self, shell_name=None, name=None, namespace=True):
-        """   """
+    def __init__(self, shell_name=None, name=None, supported_os=None, namespace=True):
+        """ Init method
+
+        :param shell_name: Shell Name
+        :type shell_name: str
+        :param name: Resource Name
+        :type name: str
+        :param supported_os: list of supported OS
+        :type supported_os: list
+        :param namespace: determine is namespace for attributes should be use(True - with namespace, False - without)
+        :type namespace: bool
+        """
 
         self.attributes = {}
         self.shell_name = shell_name
         self.name = name
+        self.supported_os = supported_os
         self.fullname = None
         self.address = None  # The IP address of the resource
         self.family = None  # The resource family
         self.namespace = namespace
+
         if namespace:
             self.namespace_prefix = "{}".format(self.shell_name)
         else:
@@ -24,10 +36,11 @@ class GenericNetworkingResource(object):
         :param context: cloudshell.shell.core.driver_context.ResourceCommandContext
         :type context: cloudshell.shell.core.driver_context.ResourceCommandContext
         :return:
-        :rtype BaseEntity
+        :rtype GenericNetworkingResource
         """
         result = GenericNetworkingResource(shell_name=self.shell_name,
                                            name=context.resource.name,
+                                           supported_os=self.supported_os,
                                            namespace=self.namespace)
         result.address = context.resource.address
         result.family = context.resource.family
