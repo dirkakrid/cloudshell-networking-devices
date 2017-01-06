@@ -3,11 +3,9 @@
 
 from collections import defaultdict
 
-
 AVAILABLE_SHELL_TYPES = ["CS_Switch",
                          "CS_Router",
                          "CS_Controller"]
-
 
 __all__ = ["GenericResource", "GenericChassis",
            "GenericModule", "GenericSubModule",
@@ -15,6 +13,7 @@ __all__ = ["GenericResource", "GenericChassis",
 
 
 class AbstractResource(object):
+    RESOURCE_MODEL = ""
     RELATIVE_PATH_TEMPLATE = ""
 
     def __init__(self, shell_name, name, unique_id):
@@ -22,6 +21,11 @@ class AbstractResource(object):
 
         self._name = name
         self.shell_name = shell_name
+        if self.shell_name:
+            self.namespace = "{shell_name}.{resource_model}.".format(shell_name=self.shell_name,
+                                                                     resource_model=self.RESOURCE_MODEL)
+        else:
+            self.namespace = ""
         self._cloudshell_model_name = "{shell_name}.{shell_model_name}".format(shell_name=self.shell_name,
                                                                                shell_model_name=self.__class__.__name__)
         self.unique_id = unique_id
@@ -39,13 +43,7 @@ class AbstractResource(object):
     def cloudshell_model_name(self):
         """ Return the name of the CloudShell model """
 
-        return self.__class__.__name__
-
-    @cloudshell_model_name.setter
-    def cloudshell_model_name(self, model_name):
-        """ Set the name of the CloudShell model """
-
-        self.__class__.__name__ = model_name
+        return self.RESOURCE_MODEL
 
     @property
     def name(self):
@@ -73,6 +71,7 @@ class AbstractResource(object):
 
 
 class GenericResource(AbstractResource):
+    RESOURCE_MODEL = ""
     RELATIVE_PATH_TEMPLATE = ""
 
     def __init__(self, shell_name, name, unique_id, shell_type="CS_Switch"):
@@ -88,8 +87,7 @@ class GenericResource(AbstractResource):
     def contact_name(self):
         """ Return the name of a contact registered in the device """
 
-        return self.attributes["{}.Contact Name".format(self.shell_name)] if "{}.Contact Name".format(
-            self.shell_name) in self.attributes else None
+        return self.attributes.get("{}.Contact Name".format(self.shell_name), None)
 
     @contact_name.setter
     def contact_name(self, value):
@@ -101,8 +99,7 @@ class GenericResource(AbstractResource):
     def os_version(self):
         """ Return version of the Operating System """
 
-        return self.attributes["{}.OS Version".format(self.shell_type)] if "{}.OS Version".format(
-            self.shell_type) in self.attributes else None
+        return self.attributes.get("{}.OS Version".format(self.shell_type), None)
 
     @os_version.setter
     def os_version(self, value):
@@ -114,8 +111,7 @@ class GenericResource(AbstractResource):
     def system_name(self):
         """ Set device system name """
 
-        return self.attributes["{}.System Name".format(self.shell_type)] if "{}.System Name".format(
-            self.shell_type) in self.attributes else None
+        return self.attributes.get("{}.System Name".format(self.shell_type), None)
 
     @system_name.setter
     def system_name(self, value):
@@ -127,8 +123,7 @@ class GenericResource(AbstractResource):
     def vendor(self):
         """ Return The name of the device manufacture """
 
-        return self.attributes["{}.Vendor".format(self.shell_type)] if "{}.Vendor".format(
-            self.shell_type) in self.attributes else None
+        return self.attributes.get("{}.Vendor".format(self.shell_type), None)
 
     @vendor.setter
     def vendor(self, value=""):
@@ -140,8 +135,7 @@ class GenericResource(AbstractResource):
     def location(self):
         """ The device physical location identifier. For example Lab1/Floor2/Row5/Slot4 """
 
-        return self.attributes["{}.Location".format(self.shell_type)] if "{}.Location".format(
-            self.shell_type) in self.attributes else None
+        return self.attributes.get("{}.Location".format(self.shell_type), None)
 
     @location.setter
     def location(self, value=""):
@@ -153,8 +147,7 @@ class GenericResource(AbstractResource):
     def model(self):
         """ Return the device model. This information is typically used for abstract resource filtering """
 
-        return self.attributes["{}.Model".format(self.shell_type)] if "{}.Model".format(
-            self.shell_type) in self.attributes else None
+        return self.attributes.get("{}.Model".format(self.shell_type), None)
 
     @model.setter
     def model(self, value=""):
@@ -164,30 +157,27 @@ class GenericResource(AbstractResource):
 
 
 class GenericChassis(AbstractResource):
+    RESOURCE_MODEL = "GenericChassis"
     RELATIVE_PATH_TEMPLATE = "CH"
 
     @property
     def model(self):
         """ Return the chassis model """
 
-        return self.attributes[
-            "{}.GenericChassis.Model".format(self.shell_name)] if "{}.GenericChassis.Model".format(
-            self.shell_name) in self.attributes else None
+        return self.attributes.get("{}Model".format(self.namespace), None)
 
     @model.setter
     def model(self, value=""):
         """ Set the chassis model """
 
-        self.attributes["{}.GenericChassis.Model".format(self.shell_name)] = value
+        self.attributes["{}Model".format(self.namespace)] = value
 
     @property
     def serial_number(self):
         """
         :rtype: str
         """
-        return self.attributes[
-            "{}.GenericChassis.Serial Number".format(self.shell_name)] if "{}.GenericChassis.Serial Number".format(
-            self.shell_name) in self.attributes else None
+        return self.attributes.get("{}Serial Number".format(self.namespace), None)
 
     @serial_number.setter
     def serial_number(self, value=""):
@@ -195,10 +185,11 @@ class GenericChassis(AbstractResource):
 
         :type value: str
         """
-        self.attributes["{}.GenericChassis.Serial Number".format(self.shell_name)] = value
+        self.attributes["{}Serial Number".format(self.namespace)] = value
 
 
 class GenericModule(AbstractResource):
+    RESOURCE_MODEL = "GenericModule"
     RELATIVE_PATH_TEMPLATE = "M"
 
     @property
@@ -206,9 +197,7 @@ class GenericModule(AbstractResource):
         """
         :rtype: str
         """
-        return self.attributes[
-            "{}.GenericModule.Model".format(self.shell_name)] if "{}.GenericModule.Model".format(
-            self.shell_name) in self.attributes else None
+        return self.attributes.get("{}Model".format(self.namespace), None)
 
     @model.setter
     def model(self, value=""):
@@ -216,16 +205,14 @@ class GenericModule(AbstractResource):
 
         :type value: str
         """
-        self.attributes["{}.GenericModule.Model".format(self.shell_name)] = value
+        self.attributes["{}Model".format(self.namespace)] = value
 
     @property
     def version(self):
         """
         :rtype: str
         """
-        return self.attributes[
-            "{}.GenericModule.Version".format(self.shell_name)] if "{}.GenericModule.Version".format(
-            self.shell_name) in self.attributes else None
+        return self.attributes.get("{}Version".format(self.namespace), None)
 
     @version.setter
     def version(self, value=""):
@@ -233,16 +220,14 @@ class GenericModule(AbstractResource):
 
         :type value: str
         """
-        self.attributes["{}.GenericModule.Version".format(self.shell_name)] = value
+        self.attributes["{}Version".format(self.namespace)] = value
 
     @property
     def serial_number(self):
         """
         :rtype: str
         """
-        return self.attributes[
-            "{}.GenericModule.Serial Number".format(self.shell_name)] if "{}.GenericModule.Serial Number".format(
-            self.shell_name) in self.attributes else None
+        return self.attributes.get("{}Serial Number".format(self.namespace), None)
 
     @serial_number.setter
     def serial_number(self, value=""):
@@ -250,10 +235,11 @@ class GenericModule(AbstractResource):
 
         :type value: str
         """
-        self.attributes["{}.GenericModule.Serial Number".format(self.shell_name)] = value
+        self.attributes["{}Serial Number".format(self.namespace)] = value
 
 
 class GenericSubModule(AbstractResource):
+    RESOURCE_MODEL = "GenericSubModule"
     RELATIVE_PATH_TEMPLATE = "SM"
 
     @property
@@ -261,9 +247,7 @@ class GenericSubModule(AbstractResource):
         """
         :rtype: str
         """
-        return self.attributes[
-            "{}.GenericSubModule.Model".format(self.shell_name)] if "{}.GenericSubModule.Model".format(
-            self.shell_name) in self.attributes else None
+        return self.attributes.get("{}Model".format(self.namespace), None)
 
     @model.setter
     def model(self, value=""):
@@ -271,16 +255,14 @@ class GenericSubModule(AbstractResource):
 
         :type value: str
         """
-        self.attributes["{}.GenericSubModule.Model".format(self.shell_name)] = value
+        self.attributes["{}Model".format(self.namespace)] = value
 
     @property
     def version(self):
         """
         :rtype: str
         """
-        return self.attributes[
-            "{}.GenericSubModule.Version".format(self.shell_name)] if "{}.GenericSubModule.Version".format(
-            self.shell_name) in self.attributes else None
+        return self.attributes.get("{}Version".format(self.namespace), None)
 
     @version.setter
     def version(self, value=""):
@@ -288,16 +270,14 @@ class GenericSubModule(AbstractResource):
 
         :type value: str
         """
-        self.attributes["{}.GenericSubModule.Version".format(self.shell_name)] = value
+        self.attributes["{}Version".format(self.namespace)] = value
 
     @property
     def serial_number(self):
         """
         :rtype: str
         """
-        return self.attributes[
-            "{}.GenericSubModule.Serial Number".format(self.shell_name)] if "{}.GenericSubModule.Serial Number".format(
-            self.shell_name) in self.attributes else None
+        return self.attributes.get("{}Serial Number".format(self.namespace), None)
 
     @serial_number.setter
     def serial_number(self, value=""):
@@ -305,10 +285,11 @@ class GenericSubModule(AbstractResource):
 
         :type value: str
         """
-        self.attributes["{}.GenericSubModule.Serial Number".format(self.shell_name)] = value
+        self.attributes["{}Serial Number".format(self.namespace)] = value
 
 
 class GenericPort(AbstractResource):
+    RESOURCE_MODEL = "GenericPort"
     RELATIVE_PATH_TEMPLATE = "P"
 
     @property
@@ -316,9 +297,7 @@ class GenericPort(AbstractResource):
         """
         :rtype: str
         """
-        return self.attributes[
-            "{}.GenericPort.MAC Address".format(self.shell_name)] if "{}.GenericPort.MAC Address".format(
-            self.shell_name) in self.attributes else None
+        return self.attributes.get("{}MAC Address".format(self.namespace), None)
 
     @mac_address.setter
     def mac_address(self, value=""):
@@ -326,16 +305,14 @@ class GenericPort(AbstractResource):
 
         :type value: str
         """
-        self.attributes["{}.GenericPort.MAC Address".format(self.shell_name)] = value
+        self.attributes["{}MAC Address".format(self.namespace)] = value
 
     @property
     def l2_protocol_type(self):
         """
         :rtype: str
         """
-        return self.attributes[
-            "{}.GenericPort.L2 Protocol Type".format(self.shell_name)] if "{}.GenericPort.L2 Protocol Type".format(
-            self.shell_name) in self.attributes else None
+        return self.attributes.get("{}L2 Protocol Type".format(self.namespace), None)
 
     @l2_protocol_type.setter
     def l2_protocol_type(self, value):
@@ -343,16 +320,14 @@ class GenericPort(AbstractResource):
         Such as POS, Serial
         :type value: str
         """
-        self.attributes["{}.GenericPort.L2 Protocol Type".format(self.shell_name)] = value
+        self.attributes["{}L2 Protocol Type".format(self.namespace)] = value
 
     @property
     def ipv4_address(self):
         """
         :rtype: str
         """
-        return self.attributes[
-            "{}.GenericPort.IPv4 Address".format(self.shell_name)] if "{}.GenericPort.IPv4 Address".format(
-            self.shell_name) in self.attributes else None
+        return self.attributes.get("{}IPv4 Address".format(self.namespace), None)
 
     @ipv4_address.setter
     def ipv4_address(self, value):
@@ -360,16 +335,14 @@ class GenericPort(AbstractResource):
 
         :type value: str
         """
-        self.attributes["{}.GenericPort.IPv4 Address".format(self.shell_name)] = value
+        self.attributes["{}IPv4 Address".format(self.namespace)] = value
 
     @property
     def ipv6_address(self):
         """
         :rtype: str
         """
-        return self.attributes[
-            "{}.GenericPort.IPv6 Address".format(self.shell_name)] if "{}.GenericPort.IPv6 Address".format(
-            self.shell_name) in self.attributes else None
+        return self.attributes.get("{}IPv6 Address".format(self.namespace), None)
 
     @ipv6_address.setter
     def ipv6_address(self, value):
@@ -377,16 +350,14 @@ class GenericPort(AbstractResource):
 
         :type value: str
         """
-        self.attributes["{}.GenericPort.IPv6 Address".format(self.shell_name)] = value
+        self.attributes["{}IPv6 Address".format(self.namespace)] = value
 
     @property
     def port_description(self):
         """
         :rtype: str
         """
-        return self.attributes[
-            "{}.GenericPort.Port Description".format(self.shell_name)] if "{}.GenericPort.Port Description".format(
-            self.shell_name) in self.attributes else None
+        return self.attributes.get("{}Port Description".format(self.namespace), None)
 
     @port_description.setter
     def port_description(self, value):
@@ -394,16 +365,14 @@ class GenericPort(AbstractResource):
         The description of the port as configured in the device.
         :type value: str
         """
-        self.attributes["{}.GenericPort.Port Description".format(self.shell_name)] = value
+        self.attributes["{}Port Description".format(self.namespace)] = value
 
     @property
     def bandwidth(self):
         """
         :rtype: float
         """
-        return self.attributes[
-            "{}.GenericPort.Bandwidth".format(self.shell_name)] if "{}.GenericPort.Bandwidth".format(
-            self.shell_name) in self.attributes else None
+        return self.attributes.get("{}Bandwidth".format(self.namespace), None)
 
     @bandwidth.setter
     def bandwidth(self, value):
@@ -411,16 +380,14 @@ class GenericPort(AbstractResource):
         The current interface bandwidth, in MB.
         :type value: float
         """
-        self.attributes["{}.GenericPort.Bandwidth".format(self.shell_name)] = value
+        self.attributes["{}Bandwidth".format(self.namespace)] = value
 
     @property
     def mtu(self):
         """
         :rtype: float
         """
-        return self.attributes[
-            "{}.GenericPort.MTU".format(self.shell_name)] if "{}.GenericPort.MTU".format(
-            self.shell_name) in self.attributes else None
+        return self.attributes.get("{}MTU".format(self.namespace), None)
 
     @mtu.setter
     def mtu(self, value):
@@ -428,16 +395,14 @@ class GenericPort(AbstractResource):
         The current MTU configured on the interface.
         :type value: float
         """
-        self.attributes["{}.GenericPort.MTU".format(self.shell_name)] = value
+        self.attributes["{}MTU".format(self.namespace)] = value
 
     @property
     def duplex(self):
         """
         :rtype: str
         """
-        return self.attributes[
-            "{}.GenericPort.Duplex".format(self.shell_name)] if "{}.GenericPort.Duplex".format(
-            self.shell_name) in self.attributes else None
+        return self.attributes.get("{}Duplex".format(self.namespace), None)
 
     @duplex.setter
     def duplex(self, value):
@@ -445,16 +410,14 @@ class GenericPort(AbstractResource):
         The current duplex configuration on the interface. Possible values are Half or Full.
         :type value: str
         """
-        self.attributes["{}.GenericPort.Duplex".format(self.shell_name)] = value
+        self.attributes["{}Duplex".format(self.namespace)] = value
 
     @property
     def adjacent(self):
         """
         :rtype: str
         """
-        return self.attributes[
-            "{}.GenericPort.Adjacent".format(self.shell_name)] if "{}.GenericPort.Adjacent".format(
-            self.shell_name) in self.attributes else None
+        return self.attributes.get("{}Adjacent".format(self.namespace), None)
 
     @adjacent.setter
     def adjacent(self, value):
@@ -462,16 +425,14 @@ class GenericPort(AbstractResource):
         The adjacent device (system name) and port, based on LLDP or CDP protocol.
         :type value: str
         """
-        self.attributes["{}.GenericPort.Adjacent".format(self.shell_name)] = value
+        self.attributes["{}Adjacent".format(self.namespace)] = value
 
     @property
     def protocol_type(self):
         """
         :rtype: str
         """
-        return self.attributes[
-            "{}.GenericPort.Protocol Type".format(self.shell_name)] if "{}.GenericPort.Protocol Type".format(
-            self.shell_name) in self.attributes else None
+        return self.attributes.get("{}Protocol Type".format(self.namespace), None)
 
     @protocol_type.setter
     def protocol_type(self, value="0"):
@@ -479,16 +440,14 @@ class GenericPort(AbstractResource):
         Default values is Transparent (="0")
         :type value: str
         """
-        self.attributes["{}.GenericPort.Protocol Type".format(self.shell_name)] = value
+        self.attributes["{}Protocol Type".format(self.namespace)] = value
 
     @property
     def auto_negotiation(self):
         """
         :rtype: bool
         """
-        return self.attributes[
-            "{}.GenericPort.Auto Negotiation".format(self.shell_name)] if "{}.GenericPort.Auto Negotiation".format(
-            self.shell_name) in self.attributes else None
+        return self.attributes.get("{}Auto Negotiation".format(self.namespace), None)
 
     @auto_negotiation.setter
     def auto_negotiation(self, value):
@@ -496,10 +455,11 @@ class GenericPort(AbstractResource):
         The current auto negotiation configuration on the interface.
         :type value: bool
         """
-        self.attributes["{}.GenericPort.Auto Negotiation".format(self.shell_name)] = value
+        self.attributes["{}GenericPort.Auto Negotiation".format(self.namespace)] = value
 
 
 class GenericPowerPort(AbstractResource):
+    RESOURCE_MODEL = "GenericPowerPort"
     RELATIVE_PATH_TEMPLATE = "PP"
 
     @property
@@ -507,9 +467,7 @@ class GenericPowerPort(AbstractResource):
         """
         :rtype: str
         """
-        return self.attributes[
-            "{}.GenericPowerPort.Model".format(self.shell_name)] if "{}.GenericPowerPort.Model".format(
-            self.shell_name) in self.attributes else None
+        return self.attributes.get("{}Model".format(self.namespace), None)
 
     @model.setter
     def model(self, value):
@@ -517,16 +475,14 @@ class GenericPowerPort(AbstractResource):
         The device model. This information is typically used for abstract resource filtering.
         :type value: str
         """
-        self.attributes["{}.GenericPowerPort.Model".format(self.shell_name)] = value
+        self.attributes["{}Model".format(self.namespace)] = value
 
     @property
     def serial_number(self):
         """
         :rtype: str
         """
-        return self.attributes[
-            "{}.GenericPowerPort.Serial Number".format(self.shell_name)] if "{}.GenericPowerPort.Serial Number".format(
-            self.shell_name) in self.attributes else None
+        return self.attributes.get("{}Serial Number".format(self.namespace), None)
 
     @serial_number.setter
     def serial_number(self, value):
@@ -534,16 +490,14 @@ class GenericPowerPort(AbstractResource):
 
         :type value: str
         """
-        self.attributes["{}.GenericPowerPort.Serial Number".format(self.shell_name)] = value
+        self.attributes["{}Serial Number".format(self.namespace)] = value
 
     @property
     def version(self):
         """
         :rtype: str
         """
-        return self.attributes[
-            "{}.GenericPowerPort.Version".format(self.shell_name)] if "{}.GenericPowerPort.Version".format(
-            self.shell_name) in self.attributes else None
+        return self.attributes.get("{}Version".format(self.namespace), None)
 
     @version.setter
     def version(self, value):
@@ -551,17 +505,14 @@ class GenericPowerPort(AbstractResource):
         The firmware version of the resource.
         :type value: str
         """
-        self.attributes["{}.GenericPowerPort.Version".format(self.shell_name)] = value
+        self.attributes["{}Version".format(self.namespace)] = value
 
     @property
     def port_description(self):
         """
         :rtype: str
         """
-        return self.attributes[
-            "{}.GenericPowerPort.Port Description".format(
-                self.shell_name)] if "{}.GenericPowerPort.Port Description".format(
-            self.shell_name) in self.attributes else None
+        return self.attributes.get("{}Port Description".format(self.namespace), None)
 
     @port_description.setter
     def port_description(self, value):
@@ -569,10 +520,11 @@ class GenericPowerPort(AbstractResource):
         The description of the port as configured in the device.
         :type value: str
         """
-        self.attributes["{}.GenericPowerPort.Port Description".format(self.shell_name)] = value
+        self.attributes["{}Port Description".format(self.namespace)] = value
 
 
 class GenericPortChannel(AbstractResource):
+    RESOURCE_MODEL = "GenericPortChannel"
     RELATIVE_PATH_TEMPLATE = "PC"
 
     @property
@@ -580,10 +532,7 @@ class GenericPortChannel(AbstractResource):
         """
         :rtype: str
         """
-        return self.attributes[
-            "{}.GenericPortChannel.Associated Ports".format(
-                self.shell_name)] if "{}.GenericPortChannel.Associated Ports".format(
-            self.shell_name) in self.attributes else None
+        return self.attributes.get("{}Associated Ports".format(self.namespace), None)
 
     @associated_ports.setter
     def associated_ports(self, value):
@@ -591,17 +540,14 @@ class GenericPortChannel(AbstractResource):
         The value is in the format ???[portResourceName],??????, for example ???GE0-0-0-1,GE0-0-0-2???
         :type value: str
         """
-        self.attributes["{}.GenericPortChannel.Associated Ports".format(self.shell_name)] = value
+        self.attributes["{}Associated Ports".format(self.namespace)] = value
 
     @property
     def ipv4_address(self):
         """
         :rtype: str
         """
-        return self.attributes[
-            "{}.GenericPortChannel.IPv4 Address".format(
-                self.shell_name)] if "{}.GenericPortChannel.IPv4 Address".format(
-            self.shell_name) in self.attributes else None
+        return self.attributes.get("{}IPv4 Address".format(self.namespace), None)
 
     @ipv4_address.setter
     def ipv4_address(self, value):
@@ -609,17 +555,14 @@ class GenericPortChannel(AbstractResource):
 
         :type value: str
         """
-        self.attributes["{}.GenericPortChannel.IPv4 Address".format(self.shell_name)] = value
+        self.attributes["{}IPv4 Address".format(self.namespace)] = value
 
     @property
     def ipv6_address(self):
         """
         :rtype: str
         """
-        return self.attributes[
-            "{}.GenericPortChannel.IPv6 Address".format(
-                self.shell_name)] if "{}.GenericPortChannel.IPv6 Address".format(
-            self.shell_name) in self.attributes else None
+        return self.attributes.get("{}IPv6 Address".format(self.namespace), None)
 
     @ipv6_address.setter
     def ipv6_address(self, value):
@@ -627,17 +570,14 @@ class GenericPortChannel(AbstractResource):
 
         :type value: str
         """
-        self.attributes["{}.GenericPortChannel.IPv6 Address".format(self.shell_name)] = value
+        self.attributes["{}IPv6 Address".format(self.namespace)] = value
 
     @property
     def port_description(self):
         """
         :rtype: str
         """
-        return self.attributes[
-            "{}.GenericPortChannel.Port Description".format(
-                self.shell_name)] if "{}.GenericPortChannel.Port Description".format(
-            self.shell_name) in self.attributes else None
+        return self.attributes.get("{}Port Description".format(self.namespace), None)
 
     @port_description.setter
     def port_description(self, value):
@@ -645,17 +585,14 @@ class GenericPortChannel(AbstractResource):
         The description of the port as configured in the device.
         :type value: str
         """
-        self.attributes["{}.GenericPortChannel.Port Description".format(self.shell_name)] = value
+        self.attributes["{}Port Description".format(self.namespace)] = value
 
     @property
     def protocol_type(self):
         """
         :rtype: str
         """
-        return self.attributes[
-            "{}.GenericPortChannel.Protocol Type".format(
-                self.shell_name)] if "{}.GenericPortChannel.Protocol Type".format(
-            self.shell_name) in self.attributes else None
+        return self.attributes.get("{}Protocol Type".format(self.namespace), None)
 
     @protocol_type.setter
     def protocol_type(self, value="0s"):
@@ -663,4 +600,4 @@ class GenericPortChannel(AbstractResource):
         Default values is Transparent (="0")
         :type value: str
         """
-        self.attributes["{}.GenericPortChannel.Protocol Type".format(self.shell_name)] = value
+        self.attributes["{}Protocol Type".format(self.namespace)] = value
