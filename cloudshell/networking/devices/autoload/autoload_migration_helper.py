@@ -87,10 +87,10 @@ def migrate_autoload_details(autoload_details, shell_name, shell_type):
     for attribute in autoload_details.attributes:
 
         if not attribute.relative_address:  # Root element
-            if attribute.attribute_name == "Contact Name":
-                attribute.attribute_name = ".".join([shell_name, attribute.attribute_name])
-            else:
-                attribute.attribute_name = ".".join([shell_type, attribute.attribute_name])
+            # if attribute.attribute_name == "Contact Name":
+            #     attribute.attribute_name = ".".join([shell_name, attribute.attribute_name])
+            # else:
+            attribute.attribute_name = ".".join([shell_type, attribute.attribute_name])
         else:
             attribute.attribute_name = ".".join(
                 [shell_name, mapping[attribute.relative_address], attribute.attribute_name])
