@@ -9,10 +9,9 @@ import time
 from abc import abstractproperty
 from posixpath import join
 
-from cloudshell.networking.devices.json_request_helper import JsonRequestDeserializer
-from cloudshell.networking.devices.networking_utils import UrlParser, serialize_to_json
-from cloudshell.networking.devices.runners.interfaces.configuration_runner_interface import \
-    ConfigurationOperationsInterface
+from cloudshell.devices.json_request_helper import JsonRequestDeserializer
+from cloudshell.devices.networking_utils import UrlParser, serialize_to_json
+from cloudshell.devices.runners.interfaces.configuration_runner_interface import ConfigurationOperationsInterface
 from cloudshell.shell.core.interfaces.save_restore import OrchestrationSaveResult, OrchestrationSavedArtifactInfo, \
     OrchestrationSavedArtifact, OrchestrationRestoreRules
 

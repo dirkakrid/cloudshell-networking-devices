@@ -3,7 +3,7 @@
 
 
 class GenericNetworkingResource(object):
-    def __init__(self, shell_name=None, name=None, supported_os=None, namespace=True):
+    def __init__(self, shell_name=None, name=None, supported_os=None):
         """ Init method
 
         :param shell_name: Shell Name
@@ -12,8 +12,6 @@ class GenericNetworkingResource(object):
         :type name: str
         :param supported_os: list of supported OS
         :type supported_os: list
-        :param namespace: determine is namespace for attributes should be use(True - with namespace, False - without)
-        :type namespace: bool
         """
 
         self.attributes = {}
@@ -23,9 +21,8 @@ class GenericNetworkingResource(object):
         self.fullname = None
         self.address = None  # The IP address of the resource
         self.family = None  # The resource family
-        self.namespace = namespace
 
-        if namespace:
+        if shell_name:
             self.namespace_prefix = "{}".format(self.shell_name)
         else:
             self.namespace_prefix = ""
@@ -40,8 +37,7 @@ class GenericNetworkingResource(object):
         """
         result = GenericNetworkingResource(shell_name=self.shell_name,
                                            name=context.resource.name,
-                                           supported_os=self.supported_os,
-                                           namespace=self.namespace)
+                                           supported_os=self.supported_os)
         result.address = context.resource.address
         result.family = context.resource.family
         result.fullname = context.resource.fullname

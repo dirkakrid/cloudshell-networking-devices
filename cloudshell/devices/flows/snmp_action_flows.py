@@ -1,5 +1,8 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
 from abc import abstractmethod
-from cloudshell.networking.snmp_handler_interface import SnmpHandlerInterface
+from cloudshell.devices.snmp_handler_interface import SnmpHandlerInterface
 
 
 class BaseSnmpFlow(object):

@@ -4,8 +4,8 @@
 from abc import abstractproperty
 
 from cloudshell.core.logger import qs_logger
-from cloudshell.networking.devices.networking_utils import UrlParser
-from cloudshell.networking.devices.runners.interfaces.firmware_runner_interface import FirmwareRunnerInterface
+from cloudshell.devices.networking_utils import UrlParser
+from cloudshell.devices.runners.interfaces.firmware_runner_interface import FirmwareRunnerInterface
 
 
 class FirmwareRunner(FirmwareRunnerInterface):

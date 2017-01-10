@@ -3,8 +3,10 @@
 
 from abc import abstractproperty, ABCMeta
 
+from cloudshell.devices.runners.interfaces.autoload_runner_interface import AutoloadOperationsInterface
 
-class AutoloadRunner(object):
+
+class AutoloadRunner(AutoloadOperationsInterface):
     __metaclass__ = ABCMeta
 
     def __init__(self, resource_config):

@@ -3,8 +3,8 @@
 
 from abc import abstractproperty
 
-from cloudshell.networking.devices.flows.cli_action_flows import RunCommandFlow
-from cloudshell.networking.devices.runners.interfaces.run_command_runner_interface import RunCommandInterface
+from cloudshell.devices.flows.cli_action_flows import RunCommandFlow
+from cloudshell.devices.runners.interfaces.run_command_runner_interface import RunCommandInterface
 
 
 class RunCommandRunner(RunCommandInterface):

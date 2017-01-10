@@ -13,10 +13,9 @@ from cloudshell.core.driver_response import DriverResponse
 from cloudshell.core.driver_response_root import DriverResponseRoot
 from cloudshell.networking.apply_connectivity.models.connectivity_result import ConnectivityErrorResponse, \
     ConnectivitySuccessResponse
-from cloudshell.networking.devices.json_request_helper import JsonRequestDeserializer
-from cloudshell.networking.devices.networking_utils import serialize_to_json, validate_vlan_range, validate_vlan_number
-from cloudshell.networking.devices.runners.interfaces.connectivity_runner_interface import \
-    ConnectivityOperationsInterface
+from cloudshell.devices.json_request_helper import JsonRequestDeserializer
+from cloudshell.devices.networking_utils import serialize_to_json, validate_vlan_range, validate_vlan_number
+from cloudshell.devices.runners.interfaces.connectivity_runner_interface import ConnectivityOperationsInterface
 
 
 class ConnectivityRunner(ConnectivityOperationsInterface):

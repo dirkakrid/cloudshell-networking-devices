@@ -1,13 +1,14 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
+
+from abc import abstractproperty
+
 from cloudshell.cli.cli import CLI
 from cloudshell.cli.cli_service_impl import CommandModeContextManager
-
 from cloudshell.cli.command_mode import CommandMode
 from cloudshell.cli.session.ssh_session import SSHSession
 from cloudshell.cli.session.telnet_session import TelnetSession
-from cloudshell.networking.cli_handler_interface import CliHandlerInterface
-from cloudshell.shell.core.context_utils import get_attribute_by_name, get_resource_address
+from cloudshell.devices.cli_handler_interface import CliHandlerInterface
 
 
 class CliHandlerImpl(CliHandlerInterface):
@@ -26,11 +27,13 @@ class CliHandlerImpl(CliHandlerInterface):
         self._logger = logger
         self._api = api
 
-        # --------------------------------------------------------
-        # the modes must be defined to trigger 'RunCustomCommand' as is
-        self.enable_mode = None
-        self.config_mode = None
-        # --------------------------------------------------------
+    @abstractproperty
+    def enable_mode(self):
+        pass
+
+    @abstractproperty
+    def config_mode(self):
+        pass
 
     @property
     def username(self):

@@ -1,7 +1,9 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
 from abc import abstractmethod
-from cloudshell.networking.devices.driver_helper import get_snmp_parameters_from_command_context
-from cloudshell.networking.snmp_handler_interface import SnmpHandlerInterface
-from cloudshell.shell.core.context_utils import get_attribute_by_name
+from cloudshell.devices.driver_helper import get_snmp_parameters_from_command_context
+from cloudshell.devices.snmp_handler_interface import SnmpHandlerInterface
 
 from cloudshell.snmp.quali_snmp import QualiSnmp
 

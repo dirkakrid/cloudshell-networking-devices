@@ -3,9 +3,8 @@
 
 from abc import abstractproperty
 
-from cloudshell.networking.devices.flows.cli_action_flows import RunCommandFlow
-from cloudshell.networking.devices.runners.interfaces.state_runner_interface import StateOperationsInterface
-from cloudshell.shell.core.context_utils import get_resource_name
+from cloudshell.devices.flows.cli_action_flows import RunCommandFlow
+from cloudshell.devices.runners.interfaces.state_runner_interface import StateOperationsInterface
 
 
 class StateRunner(StateOperationsInterface):

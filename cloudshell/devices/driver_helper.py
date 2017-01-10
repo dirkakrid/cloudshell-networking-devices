@@ -5,7 +5,6 @@ import threading
 
 from cloudshell.cli.cli import CLI
 from cloudshell.cli.session_pool_manager import SessionPoolManager
-from cloudshell.shell.core.context_utils import get_attribute_by_name
 from cloudshell.shell.core.session.cloudshell_session import CloudShellSessionContext
 from cloudshell.shell.core.session.logging_session import LoggingSessionContext
 from cloudshell.snmp.snmp_parameters import SNMPV2Parameters, SNMPV3Parameters
