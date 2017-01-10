@@ -100,13 +100,13 @@ class GenericResource(AbstractResource):
     def contact_name(self):
         """ Return the name of a contact registered in the device """
 
-        return self.attributes.get("{}Contact Name".format(self.shell_name), None)
+        return self.attributes.get("{}Contact Name".format(self.shell_type), None)
 
     @contact_name.setter
     def contact_name(self, value):
         """ Set the name of a contact registered in the device """
 
-        self.attributes["{}Contact Name".format(self.shell_name)] = value
+        self.attributes["{}Contact Name".format(self.shell_type)] = value
 
     @property
     def os_version(self):
