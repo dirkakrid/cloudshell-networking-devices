@@ -45,12 +45,6 @@ class AbstractResource(object):
 
         return self._cloudshell_model_name
 
-    # @cloudshell_model_name.setter
-    # def cloudshell_model_name(self, value):
-    #     """ Return the name of the CloudShell model """
-    #
-    #     self._cloudshell_model_name = value
-
     @property
     def name(self):
         """ Return resource name """
@@ -94,7 +88,6 @@ class GenericResource(AbstractResource):
         else:
             self.shell_name = ""
             self.shell_type = ""
-
 
     @property
     def contact_name(self):

@@ -23,28 +23,9 @@ class GenericNetworkingResource(object):
         self.family = None  # The resource family
 
         if shell_name:
-            self.namespace_prefix = "{}".format(self.shell_name)
+            self.namespace_prefix = "{}.".format(self.shell_name)
         else:
             self.namespace_prefix = ""
-
-    def create_from_context(self, context):
-        """
-        Creates an instance of Networking Resource by given context
-        :param context: cloudshell.shell.core.driver_context.ResourceCommandContext
-        :type context: cloudshell.shell.core.driver_context.ResourceCommandContext
-        :return:
-        :rtype GenericNetworkingResource
-        """
-        result = GenericNetworkingResource(shell_name=self.shell_name,
-                                           name=context.resource.name,
-                                           supported_os=self.supported_os)
-        result.address = context.resource.address
-        result.family = context.resource.family
-        result.fullname = context.resource.fullname
-
-        for attr_name, attr_value in context.resource.attributes.iteritems():
-            result.attributes[attr_name] = attr_value
-        return result
 
     @property
     def backup_location(self):
@@ -213,3 +194,26 @@ class GenericNetworkingResource(object):
         :rtype: str
         """
         return self.attributes.get("{}CLI TCP Port".format(self.namespace_prefix), None)
+
+
+def create_networking_resource_from_context(shell_name, supported_os, context):
+    """
+    Creates an instance of Networking Resource by given context
+    :param shell_name: Shell Name
+    :type shell_name: str
+    :param supported_os: list of supported OS
+    :type supported_os: list
+    :param context: cloudshell.shell.core.driver_context.ResourceCommandContext
+    :type context: cloudshell.shell.core.driver_context.ResourceCommandContext
+    :return:
+    :rtype GenericNetworkingResource
+    """
+
+    result = GenericNetworkingResource(shell_name=shell_name, name=context.resource.name, supported_os=supported_os)
+    result.address = context.resource.address
+    result.family = context.resource.family
+    result.fullname = context.resource.fullname
+
+    result.attributes = dict(context.resource.attributes)
+
+    return result
