@@ -82,17 +82,18 @@ def migrate_autoload_details(autoload_details, shell_name, shell_type):
     :return:
     """
 
-    mapping = {resource.relative_address: resource.model for resource in autoload_details.resources}
+    mapping = {}
+    for resource in autoload_details.resources:
+        resource.model = "{shell_name}.{model}".format(shell_name=shell_name, model=resource.model)
+        mapping[resource.relative_address] = resource.model
 
     for attribute in autoload_details.attributes:
 
         if not attribute.relative_address:  # Root element
-            # if attribute.attribute_name == "Contact Name":
-            #     attribute.attribute_name = ".".join([shell_name, attribute.attribute_name])
-            # else:
-            attribute.attribute_name = ".".join([shell_type, attribute.attribute_name])
+            attribute.attribute_name = "{shell_type}.{attr_name}".format(shell_type=shell_type,
+                                                                         attr_name=attribute.attribute_name)
         else:
-            attribute.attribute_name = ".".join(
-                [shell_name, mapping[attribute.relative_address], attribute.attribute_name])
+            attribute.attribute_name = "{model}.{attr_name}".format(model=mapping[attribute.relative_address],
+                                                                    attr_name=attribute.attribute_name)
 
     return autoload_details
