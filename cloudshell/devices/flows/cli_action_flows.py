@@ -153,5 +153,5 @@ class EnableSnmpFlow(BaseCliFlow):
 
 class DisableSnmpFlow(BaseCliFlow):
     @abstractmethod
-    def execute_flow(self):
+    def execute_flow(self, snmp_parameters=None):
         pass

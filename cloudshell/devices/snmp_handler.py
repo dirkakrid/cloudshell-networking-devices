@@ -46,7 +46,7 @@ class SnmpContextManager(object):
         :return:
         """
         if self._disable_flow:
-            self._disable_flow.execute_flow()
+            self._disable_flow.execute_flow(self._snmp_parameters)
 
 
 class SnmpHandler(SnmpHandlerInterface):
