@@ -25,10 +25,11 @@ class GenericResource(AutoLoadResource):
         :param attributes_dict:
         :return:
         """
-        if element_id:
-            self.element_id = int(element_id)
-        else:
+        if element_id is None or element_id is '':
             self.element_id = -1
+        else:
+            self.element_id = int(element_id)
+
 
         self._container_id = container_id
 
