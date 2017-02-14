@@ -54,10 +54,10 @@ class SnmpHandler(SnmpHandlerInterface):
     Collect parameters for creating snmp handler
     """
 
-    def __init__(self, resource_config, logger):
+    def __init__(self, resource_config, logger, api):
         self.resource_config = resource_config
         self._logger = logger
-        self._snmp_parameters = get_snmp_parameters_from_command_context(resource_config)
+        self._snmp_parameters = get_snmp_parameters_from_command_context(resource_config, api)
 
     @property
     def enable_flow(self):

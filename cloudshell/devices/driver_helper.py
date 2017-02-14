@@ -8,7 +8,7 @@ from cloudshell.cli.session_pool_manager import SessionPoolManager
 from cloudshell.shell.core.session.cloudshell_session import CloudShellSessionContext
 from cloudshell.shell.core.session.logging_session import LoggingSessionContext
 from cloudshell.snmp.snmp_parameters import SNMPV2Parameters, SNMPV3Parameters
-from cloudshell.snmp.quali_snmp import QualiSnmp
+# from cloudshell.snmp.quali_snmp import QualiSnmp
 
 
 def get_cli(session_pool_size, pool_timeout=100):
@@ -43,7 +43,7 @@ def get_api(context):
     return CloudShellSessionContext(context).get_api()
 
 
-def get_snmp_parameters_from_command_context(resource_config):
+def get_snmp_parameters_from_command_context(resource_config, api):
     """
     :param ResourceCommandContext command_context: command context
     :return:
@@ -52,14 +52,14 @@ def get_snmp_parameters_from_command_context(resource_config):
     if '3' in resource_config.snmp_version:
         return SNMPV3Parameters(ip=resource_config.address,
                                 snmp_user=resource_config.snmp_v3_user or '',
-                                snmp_password=resource_config.snmp_v3_password or '',
-                                snmp_private_key=resource_config.snmp_v3_private_key or ''
-                                )
+                                snmp_password=api.DecryptPassword(resource_config.snmp_v3_password).Value or '',
+                                snmp_private_key=resource_config.snmp_v3_private_key or '')
     else:
         return SNMPV2Parameters(ip=resource_config.address,
-                                snmp_community=resource_config.snmp_read_community or '')
+                                snmp_community=api.DecryptPassword(resource_config.snmp_read_community).Value or '')
+                                # snmp_community=resource_config.snmp_read_community or '')
 
 
-def get_snmp_handler(context, logger):
-    snmp_handler_params = get_snmp_parameters_from_command_context(context)
-    return QualiSnmp(snmp_parameters=snmp_handler_params, logger=logger)
+# def get_snmp_handler(resource_config, logger, api):
+#     snmp_handler_params = get_snmp_parameters_from_command_context(resource_config, api)
+#     return QualiSnmp(snmp_parameters=snmp_handler_params, logger=logger)
