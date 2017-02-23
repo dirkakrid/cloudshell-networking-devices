@@ -381,7 +381,7 @@ class GenericPort(AbstractResource):
         """
         :rtype: float
         """
-        return self.attributes.get("{}Bandwidth".format(self.namespace), None)
+        return self.attributes.get("{}Bandwidth".format(self.namespace), 0)
 
     @bandwidth.setter
     def bandwidth(self, value):
@@ -396,7 +396,7 @@ class GenericPort(AbstractResource):
         """
         :rtype: float
         """
-        return self.attributes.get("{}MTU".format(self.namespace), None)
+        return self.attributes.get("{}MTU".format(self.namespace), 0)
 
     @mtu.setter
     def mtu(self, value):
@@ -411,7 +411,7 @@ class GenericPort(AbstractResource):
         """
         :rtype: str
         """
-        return self.attributes.get("{}Duplex".format(self.namespace), None)
+        return self.attributes.get("{}Duplex".format(self.namespace), "Half")
 
     @duplex.setter
     def duplex(self, value):
