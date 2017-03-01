@@ -47,4 +47,5 @@ class StateRunner(StateOperationsInterface):
 
     def shutdown(self):
         """ Shutdown device """
-        pass
+
+        raise Exception(self.__class__.__name__, "Shutdown command isn't available for the current device")
