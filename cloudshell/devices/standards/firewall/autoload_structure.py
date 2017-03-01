@@ -379,7 +379,7 @@ class GenericPort(AbstractResource):
         """
         :rtype: float
         """
-        return self.attributes.get("{}Bandwidth".format(self.namespace), None)
+        return self.attributes.get("{}Bandwidth".format(self.namespace), 0)
 
     @bandwidth.setter
     def bandwidth(self, value):
@@ -387,14 +387,14 @@ class GenericPort(AbstractResource):
         The current interface bandwidth, in MB.
         :type value: float
         """
-        self.attributes["{}Bandwidth".format(self.namespace)] = value
+        self.attributes["{}Bandwidth".format(self.namespace)] = value or 0
 
     @property
     def mtu(self):
         """
         :rtype: float
         """
-        return self.attributes.get("{}MTU".format(self.namespace), None)
+        return self.attributes.get("{}MTU".format(self.namespace), 0)
 
     @mtu.setter
     def mtu(self, value):
@@ -402,14 +402,14 @@ class GenericPort(AbstractResource):
         The current MTU configured on the interface.
         :type value: float
         """
-        self.attributes["{}MTU".format(self.namespace)] = value
+        self.attributes["{}MTU".format(self.namespace)] = value or 0
 
     @property
     def duplex(self):
         """
         :rtype: str
         """
-        return self.attributes.get("{}Duplex".format(self.namespace), None)
+        return self.attributes.get("{}Duplex".format(self.namespace), "Half")
 
     @duplex.setter
     def duplex(self, value):
@@ -417,7 +417,7 @@ class GenericPort(AbstractResource):
         The current duplex configuration on the interface. Possible values are Half or Full.
         :type value: str
         """
-        self.attributes["{}Duplex".format(self.namespace)] = value
+        self.attributes["{}Duplex".format(self.namespace)] = value or "Half"
 
     @property
     def adjacent(self):
