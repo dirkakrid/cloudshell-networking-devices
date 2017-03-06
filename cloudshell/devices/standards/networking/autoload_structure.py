@@ -3,6 +3,8 @@
 
 from collections import defaultdict
 
+from cloudshell.devices.standards.validators import attr_length_validator
+
 AVAILABLE_SHELL_TYPES = ["CS_Switch",
                          "CS_Router",
                          "CS_Controller"]
@@ -55,6 +57,7 @@ class AbstractResource(object):
         return self._name
 
     @name.setter
+    @attr_length_validator
     def name(self, value):
         """ Set resource name """
 
@@ -67,6 +70,7 @@ class AbstractResource(object):
         return self.unique_id
 
     @unique_identifier.setter
+    @attr_length_validator
     def unique_identifier(self, value):
         """ Set resource uniq identifier """
 
@@ -99,6 +103,7 @@ class GenericResource(AbstractResource):
         return self.attributes.get("{}Contact Name".format(self.shell_type), None)
 
     @contact_name.setter
+    @attr_length_validator
     def contact_name(self, value):
         """ Set the name of a contact registered in the device """
 
@@ -111,6 +116,7 @@ class GenericResource(AbstractResource):
         return self.attributes.get("{}OS Version".format(self.shell_type), None)
 
     @os_version.setter
+    @attr_length_validator
     def os_version(self, value):
         """ Set version of the Operating System """
 
@@ -123,6 +129,7 @@ class GenericResource(AbstractResource):
         return self.attributes.get("{}System Name".format(self.shell_type), None)
 
     @system_name.setter
+    @attr_length_validator
     def system_name(self, value):
         """ Set device system name """
 
@@ -135,6 +142,7 @@ class GenericResource(AbstractResource):
         return self.attributes.get("{}Vendor".format(self.shell_type), None)
 
     @vendor.setter
+    @attr_length_validator
     def vendor(self, value=""):
         """ Set The name of the device manufacture """
 
@@ -147,6 +155,7 @@ class GenericResource(AbstractResource):
         return self.attributes.get("{}Location".format(self.shell_type), None)
 
     @location.setter
+    @attr_length_validator
     def location(self, value=""):
         """ Set The device physical location identifier """
 
@@ -159,6 +168,7 @@ class GenericResource(AbstractResource):
         return self.attributes.get("{}Model".format(self.shell_type), None)
 
     @model.setter
+    @attr_length_validator
     def model(self, value=""):
         """ Set the device model. This information is typically used for abstract resource filtering """
 
@@ -176,6 +186,7 @@ class GenericChassis(AbstractResource):
         return self.attributes.get("{}Model".format(self.namespace), None)
 
     @model.setter
+    @attr_length_validator
     def model(self, value=""):
         """ Set the chassis model """
 
@@ -189,6 +200,7 @@ class GenericChassis(AbstractResource):
         return self.attributes.get("{}Serial Number".format(self.namespace), None)
 
     @serial_number.setter
+    @attr_length_validator
     def serial_number(self, value=""):
         """
 
@@ -209,6 +221,7 @@ class GenericModule(AbstractResource):
         return self.attributes.get("{}Model".format(self.namespace), None)
 
     @model.setter
+    @attr_length_validator
     def model(self, value=""):
         """
 
@@ -224,6 +237,7 @@ class GenericModule(AbstractResource):
         return self.attributes.get("{}Version".format(self.namespace), None)
 
     @version.setter
+    @attr_length_validator
     def version(self, value=""):
         """
 
@@ -239,6 +253,7 @@ class GenericModule(AbstractResource):
         return self.attributes.get("{}Serial Number".format(self.namespace), None)
 
     @serial_number.setter
+    @attr_length_validator
     def serial_number(self, value=""):
         """
 
@@ -259,6 +274,7 @@ class GenericSubModule(AbstractResource):
         return self.attributes.get("{}Model".format(self.namespace), None)
 
     @model.setter
+    @attr_length_validator
     def model(self, value=""):
         """
 
@@ -274,6 +290,7 @@ class GenericSubModule(AbstractResource):
         return self.attributes.get("{}Version".format(self.namespace), None)
 
     @version.setter
+    @attr_length_validator
     def version(self, value=""):
         """
 
@@ -289,6 +306,7 @@ class GenericSubModule(AbstractResource):
         return self.attributes.get("{}Serial Number".format(self.namespace), None)
 
     @serial_number.setter
+    @attr_length_validator
     def serial_number(self, value=""):
         """
 
@@ -309,6 +327,7 @@ class GenericPort(AbstractResource):
         return self.attributes.get("{}MAC Address".format(self.namespace), None)
 
     @mac_address.setter
+    @attr_length_validator
     def mac_address(self, value=""):
         """
 
@@ -324,6 +343,7 @@ class GenericPort(AbstractResource):
         return self.attributes.get("{}L2 Protocol Type".format(self.namespace), None)
 
     @l2_protocol_type.setter
+    @attr_length_validator
     def l2_protocol_type(self, value):
         """
         Such as POS, Serial
@@ -339,6 +359,7 @@ class GenericPort(AbstractResource):
         return self.attributes.get("{}IPv4 Address".format(self.namespace), None)
 
     @ipv4_address.setter
+    @attr_length_validator
     def ipv4_address(self, value):
         """
 
@@ -354,6 +375,7 @@ class GenericPort(AbstractResource):
         return self.attributes.get("{}IPv6 Address".format(self.namespace), None)
 
     @ipv6_address.setter
+    @attr_length_validator
     def ipv6_address(self, value):
         """
 
@@ -369,6 +391,7 @@ class GenericPort(AbstractResource):
         return self.attributes.get("{}Port Description".format(self.namespace), None)
 
     @port_description.setter
+    @attr_length_validator
     def port_description(self, value):
         """
         The description of the port as configured in the device.
@@ -384,6 +407,7 @@ class GenericPort(AbstractResource):
         return self.attributes.get("{}Bandwidth".format(self.namespace), 0)
 
     @bandwidth.setter
+    @attr_length_validator
     def bandwidth(self, value):
         """
         The current interface bandwidth, in MB.
@@ -399,6 +423,7 @@ class GenericPort(AbstractResource):
         return self.attributes.get("{}MTU".format(self.namespace), 0)
 
     @mtu.setter
+    @attr_length_validator
     def mtu(self, value):
         """
         The current MTU configured on the interface.
@@ -414,6 +439,7 @@ class GenericPort(AbstractResource):
         return self.attributes.get("{}Duplex".format(self.namespace), "Half")
 
     @duplex.setter
+    @attr_length_validator
     def duplex(self, value):
         """
         The current duplex configuration on the interface. Possible values are Half or Full.
@@ -430,6 +456,7 @@ class GenericPort(AbstractResource):
         return self.attributes.get("{}Adjacent".format(self.namespace), None)
 
     @adjacent.setter
+    @attr_length_validator
     def adjacent(self, value):
         """
         The adjacent device (system name) and port, based on LLDP or CDP protocol.
@@ -445,6 +472,7 @@ class GenericPort(AbstractResource):
         return self.attributes.get("{}Auto Negotiation".format(self.namespace), None)
 
     @auto_negotiation.setter
+    @attr_length_validator
     def auto_negotiation(self, value):
         """
         The current auto negotiation configuration on the interface.
@@ -465,6 +493,7 @@ class GenericPowerPort(AbstractResource):
         return self.attributes.get("{}Model".format(self.namespace), None)
 
     @model.setter
+    @attr_length_validator
     def model(self, value):
         """
         The device model. This information is typically used for abstract resource filtering.
@@ -480,6 +509,7 @@ class GenericPowerPort(AbstractResource):
         return self.attributes.get("{}Serial Number".format(self.namespace), None)
 
     @serial_number.setter
+    @attr_length_validator
     def serial_number(self, value):
         """
 
@@ -495,6 +525,7 @@ class GenericPowerPort(AbstractResource):
         return self.attributes.get("{}Version".format(self.namespace), None)
 
     @version.setter
+    @attr_length_validator
     def version(self, value):
         """
         The firmware version of the resource.
@@ -510,6 +541,7 @@ class GenericPowerPort(AbstractResource):
         return self.attributes.get("{}Port Description".format(self.namespace), None)
 
     @port_description.setter
+    @attr_length_validator
     def port_description(self, value):
         """
         The description of the port as configured in the device.
@@ -530,6 +562,7 @@ class GenericPortChannel(AbstractResource):
         return self.attributes.get("{}Associated Ports".format(self.namespace), None)
 
     @associated_ports.setter
+    @attr_length_validator
     def associated_ports(self, value):
         """ Ports associated with this port channel.
         The value is in the format ???[portResourceName],??????, for example ???GE0-0-0-1,GE0-0-0-2???
@@ -545,6 +578,7 @@ class GenericPortChannel(AbstractResource):
         return self.attributes.get("{}IPv4 Address".format(self.namespace), None)
 
     @ipv4_address.setter
+    @attr_length_validator
     def ipv4_address(self, value):
         """
 
@@ -560,6 +594,7 @@ class GenericPortChannel(AbstractResource):
         return self.attributes.get("{}IPv6 Address".format(self.namespace), None)
 
     @ipv6_address.setter
+    @attr_length_validator
     def ipv6_address(self, value):
         """
 
@@ -575,6 +610,7 @@ class GenericPortChannel(AbstractResource):
         return self.attributes.get("{}Port Description".format(self.namespace), None)
 
     @port_description.setter
+    @attr_length_validator
     def port_description(self, value):
         """
         The description of the port as configured in the device.
