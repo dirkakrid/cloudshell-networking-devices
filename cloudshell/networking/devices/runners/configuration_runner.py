@@ -42,7 +42,7 @@ class ConfigurationRunner(ConfigurationOperationsInterface):
 
     @property
     def vrf(self):
-        return get_attribute_by_name(context=context, attribute_name='VRF Management Name')
+        return get_attribute_by_name(context=self._context, attribute_name='VRF Management Name')
 
     def save(self, folder_path='', configuration_type='running', vrf_management_name=None, return_artifact=False):
         """Backup 'startup-config' or 'running-config' from device to provided file_system [ftp|tftp]
