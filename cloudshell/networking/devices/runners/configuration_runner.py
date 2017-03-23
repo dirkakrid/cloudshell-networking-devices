@@ -40,6 +40,10 @@ class ConfigurationRunner(ConfigurationOperationsInterface):
         self._restore_flow = None
         self.file_system = None
 
+    @property
+    def vrf(self):
+        return get_attribute_by_name(context=self._context, attribute_name='VRF Management Name')
+
     def save(self, folder_path='', configuration_type='running', vrf_management_name=None, return_artifact=False):
         """Backup 'startup-config' or 'running-config' from device to provided file_system [ftp|tftp]
         Also possible to backup config to localhost
@@ -50,6 +54,8 @@ class ConfigurationRunner(ConfigurationOperationsInterface):
         :rtype: OrchestrationSavedArtifact or str
         """
 
+        if not vrf_management_name:
+            vrf_management_name = self.vrf
         self._validate_configuration_type(configuration_type)
         folder_path = self.get_path(folder_path)
         system_name = re.sub('\s+', '_', self._resource_name)[:23]
@@ -77,6 +83,8 @@ class ConfigurationRunner(ConfigurationOperationsInterface):
         :return: exception on crash
         """
 
+        if not vrf_management_name:
+            vrf_management_name = self.vrf
         self._validate_configuration_type(configuration_type)
         path = self.get_path(path)
         self._restore_flow.execute_flow(path=path,
