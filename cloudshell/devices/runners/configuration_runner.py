@@ -75,6 +75,8 @@ class ConfigurationRunner(ConfigurationOperationsInterface):
         :rtype: OrchestrationSavedArtifact or str
         """
 
+        vrf = vrf_management_name or self.resource_config.vrf_management_name
+
         self._validate_configuration_type(configuration_type)
         folder_path = self.get_path(folder_path)
         system_name = re.sub('\s+', '_', self.resource_config.name)[:23]
@@ -84,7 +86,7 @@ class ConfigurationRunner(ConfigurationOperationsInterface):
         folder_path = self.get_path(full_path)
         self.save_flow.execute_flow(folder_path=folder_path,
                                     configuration_type=configuration_type.lower(),
-                                    vrf_management_name=vrf_management_name)
+                                    vrf_management_name=vrf)
 
         if return_artifact:
             artifact_type = full_path.split(':')[0]
@@ -102,12 +104,14 @@ class ConfigurationRunner(ConfigurationOperationsInterface):
         :return: exception on crash
         """
 
+        vrf = vrf_management_name or self.resource_config.vrf_management_name
+
         self._validate_configuration_type(configuration_type)
         path = self.get_path(path)
         self.restore_flow.execute_flow(path=path,
                                        configuration_type=configuration_type.lower(),
                                        restore_method=restore_method.lower(),
-                                       vrf_management_name=vrf_management_name)
+                                       vrf_management_name=vrf)
 
     def orchestration_save(self, mode="shallow", custom_params=None):
         """Orchestration Save command

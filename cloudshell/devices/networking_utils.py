@@ -325,6 +325,7 @@ def serialize_to_json(result, unpicklable=False):
     result_for_output = str(json)
     return result_for_output
 
+
 class UrlParser(object):
     SCHEME = 'scheme'
     NETLOC = 'netloc'
