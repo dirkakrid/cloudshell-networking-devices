@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from abc import abstractmethod
-from cloudshell.networking.cli_handler_impl import CliHandlerImpl
+from cloudshell.devices.cli_handler_impl import CliHandlerImpl
 
 
 class BaseCliFlow(object):
@@ -159,5 +159,5 @@ class EnableSnmpFlow(BaseCliFlow):
 
 class DisableSnmpFlow(BaseCliFlow):
     @abstractmethod
-    def execute_flow(self):
+    def execute_flow(self, snmp_parameters=None):
         pass
