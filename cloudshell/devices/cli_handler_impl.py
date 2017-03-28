@@ -1,17 +1,18 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
+
+from abc import abstractproperty
+
 from cloudshell.cli.cli import CLI
 from cloudshell.cli.cli_service_impl import CommandModeContextManager
-
 from cloudshell.cli.command_mode import CommandMode
 from cloudshell.cli.session.ssh_session import SSHSession
 from cloudshell.cli.session.telnet_session import TelnetSession
-from cloudshell.networking.cli_handler_interface import CliHandlerInterface
-from cloudshell.shell.core.context_utils import get_attribute_by_name, get_resource_address
+from cloudshell.devices.cli_handler_interface import CliHandlerInterface
 
 
 class CliHandlerImpl(CliHandlerInterface):
-    def __init__(self, cli, context, logger, api):
+    def __init__(self, cli, resource_config, logger, api):
         """
         Helps to create cli handler
         :param cli:
@@ -22,23 +23,25 @@ class CliHandlerImpl(CliHandlerInterface):
         :return:
         """
         self._cli = cli
-        self._context = context
+        self.resource_config = resource_config
         self._logger = logger
         self._api = api
 
-        # --------------------------------------------------------
-        # the modes must be defined to trigger 'RunCustomCommand' as is
-        self.enable_mode = None
-        self.config_mode = None
-        # --------------------------------------------------------
+    @abstractproperty
+    def enable_mode(self):
+        pass
+
+    @abstractproperty
+    def config_mode(self):
+        pass
 
     @property
     def username(self):
-        return get_attribute_by_name('User', self._context)
+        return self.resource_config.user
 
     @property
     def password(self):
-        password = get_attribute_by_name(attribute_name='Password', context=self._context)
+        password = self.resource_config.password
         return self._api.DecryptPassword(password).Value
 
     @property
@@ -47,7 +50,7 @@ class CliHandlerImpl(CliHandlerInterface):
 
         :return:
         """
-        return get_resource_address(self._context)
+        return self.resource_config.address
 
     @property
     def port(self):
@@ -55,7 +58,7 @@ class CliHandlerImpl(CliHandlerInterface):
 
         :return:
         """
-        return get_attribute_by_name('CLI TCP Port', self._context)
+        return self.resource_config.cli_tcp_port
 
     @property
     def cli_type(self):
@@ -63,7 +66,7 @@ class CliHandlerImpl(CliHandlerInterface):
 
         :return:
         """
-        return get_attribute_by_name('CLI Connection Type', self._context)
+        return self.resource_config.cli_connection_type
 
     def on_session_start(self, session, logger):
         """Perform some default commands when session just opened (like 'no logging console')

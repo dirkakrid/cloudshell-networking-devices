@@ -1,9 +1,11 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
+from abc import abstractproperty
+
 from cloudshell.core.logger import qs_logger
-from cloudshell.networking.devices.networking_utils import UrlParser
-from cloudshell.networking.devices.runners.interfaces.firmware_runner_interface import FirmwareRunnerInterface
+from cloudshell.devices.networking_utils import UrlParser
+from cloudshell.devices.runners.interfaces.firmware_runner_interface import FirmwareRunnerInterface
 
 
 class FirmwareRunner(FirmwareRunnerInterface):
@@ -12,12 +14,24 @@ class FirmwareRunner(FirmwareRunnerInterface):
 
         :param qs_logger logger: logger
         """
-
-        # ToDo: use as abstract methods
-        self._cli_handler = None
         self._logger = logger
         self._timeout = 500
-        self._load_firmware_flow = None
+
+    @abstractproperty
+    def cli_handler(self):
+        """ CLI Handler property
+        :return: CLI handler
+        """
+
+        pass
+
+    @abstractproperty
+    def load_firmware_flow(self):
+        """ Load Firmaware flow property
+        :return: LoadFirmawareFlow object
+        """
+
+        pass
 
     def load_firmware(self, path, vrf_management_name=None):
         """Update firmware version on device by loading provided image, performs following steps:
@@ -38,4 +52,4 @@ class FirmwareRunner(FirmwareRunnerInterface):
         if not url or not all(key in url for key in required_keys):
             raise Exception(self.__class__.__name__, "Path is wrong or empty")
 
-        self._load_firmware_flow.execute_flow(path, vrf_management_name, self._timeout)
+        self.load_firmware_flow.execute_flow(path, vrf_management_name, self._timeout)

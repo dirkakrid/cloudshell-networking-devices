@@ -1,7 +1,9 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
 from abc import abstractmethod
-from cloudshell.networking.devices.driver_helper import get_snmp_parameters_from_command_context
-from cloudshell.networking.snmp_handler_interface import SnmpHandlerInterface
-from cloudshell.shell.core.context_utils import get_attribute_by_name
+from cloudshell.devices.driver_helper import get_snmp_parameters_from_command_context
+from cloudshell.devices.snmp_handler_interface import SnmpHandlerInterface
 
 from cloudshell.snmp.quali_snmp import QualiSnmp
 
@@ -44,7 +46,7 @@ class SnmpContextManager(object):
         :return:
         """
         if self._disable_flow:
-            self._disable_flow.execute_flow()
+            self._disable_flow.execute_flow(self._snmp_parameters)
 
 
 class SnmpHandler(SnmpHandlerInterface):
@@ -52,22 +54,23 @@ class SnmpHandler(SnmpHandlerInterface):
     Collect parameters for creating snmp handler
     """
 
-    def __init__(self, context, logger):
-        self._context = context
+    def __init__(self, resource_config, logger, api):
+        self.resource_config = resource_config
         self._logger = logger
-        self._snmp_parameters = get_snmp_parameters_from_command_context(context)
+        self._snmp_parameters = get_snmp_parameters_from_command_context(resource_config, api)
 
     @property
     def enable_flow(self):
         enable_flow = None
-        if get_attribute_by_name(context=self._context, attribute_name='Enable SNMP').lower() == 'true':
+
+        if self.resource_config.enable_snmp.lower() == 'true':
             enable_flow = self._create_enable_flow()
         return enable_flow
 
     @property
     def disable_flow(self):
         disable_flow = None
-        if get_attribute_by_name(context=self._context, attribute_name='Disable SNMP').lower() == 'true':
+        if self.resource_config.disable_snmp.lower() == 'true':
             disable_flow = self._create_disable_flow()
         return disable_flow
 

@@ -1,5 +1,8 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
 from abc import abstractmethod
-from cloudshell.networking.snmp_handler_interface import SnmpHandlerInterface
+from cloudshell.devices.snmp_handler_interface import SnmpHandlerInterface
 
 
 class BaseSnmpFlow(object):
@@ -16,5 +19,5 @@ class BaseSnmpFlow(object):
 
 class AutoloadFlow(BaseSnmpFlow):
     @abstractmethod
-    def execute_flow(self, supported_os, resource_name):
+    def execute_flow(self, supported_os, shell_name, shell_type, resource_name):
         pass

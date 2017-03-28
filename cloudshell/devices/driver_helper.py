@@ -5,11 +5,10 @@ import threading
 
 from cloudshell.cli.cli import CLI
 from cloudshell.cli.session_pool_manager import SessionPoolManager
-from cloudshell.shell.core.context_utils import get_attribute_by_name
 from cloudshell.shell.core.session.cloudshell_session import CloudShellSessionContext
 from cloudshell.shell.core.session.logging_session import LoggingSessionContext
 from cloudshell.snmp.snmp_parameters import SNMPV2Parameters, SNMPV3Parameters
-from cloudshell.snmp.quali_snmp import QualiSnmp
+# from cloudshell.snmp.quali_snmp import QualiSnmp
 
 
 def get_cli(session_pool_size, pool_timeout=100):
@@ -44,28 +43,23 @@ def get_api(context):
     return CloudShellSessionContext(context).get_api()
 
 
-def get_snmp_parameters_from_command_context(command_context):
+def get_snmp_parameters_from_command_context(resource_config, api):
     """
     :param ResourceCommandContext command_context: command context
     :return:
     """
 
-    snmp_version = get_attribute_by_name(context=command_context, attribute_name='SNMP Version')
-    ip = command_context.resource.address
-
-    if '3' in snmp_version:
-        return SNMPV3Parameters(
-            ip=ip,
-            snmp_user=get_attribute_by_name(context=command_context, attribute_name='SNMP User') or '',
-            snmp_password=get_attribute_by_name(context=command_context, attribute_name='SNMP Password') or '',
-            snmp_private_key=get_attribute_by_name(context=command_context, attribute_name='SNMP Private Key') or ''
-        )
+    if '3' in resource_config.snmp_version:
+        return SNMPV3Parameters(ip=resource_config.address,
+                                snmp_user=resource_config.snmp_v3_user or '',
+                                snmp_password=api.DecryptPassword(resource_config.snmp_v3_password).Value or '',
+                                snmp_private_key=resource_config.snmp_v3_private_key or '')
     else:
-        return SNMPV2Parameters(
-            ip=ip,
-            snmp_community=get_attribute_by_name(context=command_context, attribute_name='SNMP Read Community')) or ''
+        return SNMPV2Parameters(ip=resource_config.address,
+                                snmp_community=api.DecryptPassword(resource_config.snmp_read_community).Value or '')
+                                # snmp_community=resource_config.snmp_read_community or '')
 
 
-def get_snmp_handler(context, logger):
-    snmp_handler_params = get_snmp_parameters_from_command_context(context)
-    return QualiSnmp(snmp_parameters=snmp_handler_params, logger=logger)
+# def get_snmp_handler(resource_config, logger, api):
+#     snmp_handler_params = get_snmp_parameters_from_command_context(resource_config, api)
+#     return QualiSnmp(snmp_parameters=snmp_handler_params, logger=logger)
