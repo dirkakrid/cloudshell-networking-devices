@@ -75,10 +75,12 @@ class CliHandlerImpl(CliHandlerInterface):
         pass
 
     def _ssh_session(self):
-        return SSHSession(self.resource_address, self.username, self.password, self.port, self.on_session_start)
+        return SSHSession(self.resource_address, self.username, self.password, self.port, self.on_session_start,
+                          timeout=120)
 
     def _telnet_session(self):
-        return TelnetSession(self.resource_address, self.username, self.password, self.port, self.on_session_start)
+        return TelnetSession(self.resource_address, self.username, self.password, self.port, self.on_session_start,
+                             timeout=120)
 
     def _new_sessions(self):
         if self.cli_type.lower() == SSHSession.SESSION_TYPE.lower():
