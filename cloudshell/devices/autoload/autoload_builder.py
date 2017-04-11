@@ -21,12 +21,12 @@ class AutoloadDetailsBuilder(object):
 
     @staticmethod
     def _validate_build_resource_structure(autoload_resource):
-        """ Validate resource structure
+        """Validate resource structure
 
-        :param autoload_resource: AbstractResource or inherited from AbstractResource object
-        :return result: dict: correct autoload resource structure
+        :param dict autoload_resource:
+        :return correct autoload resource structure
+        :rtype: dict
         """
-
         result = {}
 
         for resource_prefix, resources in autoload_resource.iteritems():

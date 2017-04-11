@@ -20,7 +20,7 @@ def attr_length_validator(func):
 
         for key, value in kwargs.iteritems():
             if isinstance(value, basestring):
-                kwargs.update(value[:MAX_STR_ATTR_LENGTH])
+                kwargs[key] = value[:MAX_STR_ATTR_LENGTH]
 
         return func(*nargs, **kwargs)
     return inner

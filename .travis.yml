@@ -8,7 +8,7 @@ install:
 
 script:
     - python setup.py develop
-    - nosetests --with-coverage --cover-package=autodiscovery
+    - nosetests --with-coverage --cover-package=cloudshell-networking-devices
 
 after_success:
     - coveralls
