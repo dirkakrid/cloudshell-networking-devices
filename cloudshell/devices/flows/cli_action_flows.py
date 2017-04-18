@@ -2,7 +2,13 @@
 # -*- coding: utf-8 -*-
 
 from abc import abstractmethod
+
+from cloudshell.cli.session_manager_impl import SessionManagerException
+from cloudshell.snmp.snmp_parameters import SNMPV2Parameters
+
 from cloudshell.devices.cli_handler_impl import CliHandlerImpl
+from cloudshell.devices.exceptions import InvalidSNMPParams
+from cloudshell.devices.exceptions import SetupCLISessionException
 
 
 class BaseCliFlow(object):
@@ -153,11 +159,53 @@ class ShutdownFlow(BaseCliFlow):
 
 class EnableSnmpFlow(BaseCliFlow):
     @abstractmethod
-    def execute_flow(self, snmp_parameters):
+    def _execute_flow(self, snmp_parameters):
         pass
+
+    def execute_flow(self, snmp_parameters):
+        self._validate_snmp_parameters(snmp_parameters)
+        self._validate_snmp_community_string(snmp_parameters)
+
+        try:
+            return self._execute_flow(snmp_parameters)
+        except SessionManagerException:
+            msg = "Unable to get CLI session for enabling SNMP"
+            self._logger.exception(msg)
+            raise SetupCLISessionException(msg)
+
+    def _validate_snmp_parameters(self, snmp_parameters):
+        """Check that snmp_parameters are v2"""
+        if not isinstance(snmp_parameters, SNMPV2Parameters):
+            message = "Unsupported SNMP version"
+            self._logger.error(message)
+            raise InvalidSNMPParams(message)
+
+    def _validate_snmp_community_string(self, snmp_parameters):
+        """Check that SNMP community string attribute is not empty"""
+        if not snmp_parameters.snmp_community:
+            message = "SNMP community can't be empty"
+            self._logger.error(message)
+            raise InvalidSNMPParams(message)
 
 
 class DisableSnmpFlow(BaseCliFlow):
     @abstractmethod
-    def execute_flow(self, snmp_parameters=None):
+    def _execute_flow(self, snmp_parameters):
         pass
+
+    def execute_flow(self, snmp_parameters=None):
+        if self._check_snmp_parameters(snmp_parameters):
+            try:
+                return self._execute_flow(snmp_parameters)
+            except SessionManagerException:
+                msg = "Unable to get CLI session for disabling SNMP"
+                self._logger.exception(msg)
+                raise SetupCLISessionException(msg)
+
+    def _check_snmp_parameters(self, snmp_parameters):
+        """Check that snmp_parameters are v2"""
+        if isinstance(snmp_parameters, SNMPV2Parameters) and snmp_parameters.snmp_community:
+            return True
+        else:
+            self._logger.debug("Unsupported SNMP Version or SNMP Community is empty. Disable SNMP skipped")
+            return False

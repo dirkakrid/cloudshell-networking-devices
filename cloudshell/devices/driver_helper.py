@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 
 import threading
-
 from cloudshell.cli.cli import CLI
 from cloudshell.cli.session_pool_manager import SessionPoolManager
 from cloudshell.shell.core.session.cloudshell_session import CloudShellSessionContext

@@ -2,10 +2,11 @@
 # -*- coding: utf-8 -*-
 
 from abc import abstractmethod
-from cloudshell.devices.driver_helper import get_snmp_parameters_from_command_context
-from cloudshell.devices.snmp_handler_interface import SnmpHandlerInterface
 
 from cloudshell.snmp.quali_snmp import QualiSnmp
+
+from cloudshell.devices.driver_helper import get_snmp_parameters_from_command_context
+from cloudshell.devices.snmp_handler_interface import SnmpHandlerInterface
 
 
 class SnmpContextManager(object):

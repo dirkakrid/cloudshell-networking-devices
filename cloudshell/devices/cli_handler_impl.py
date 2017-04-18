@@ -3,11 +3,9 @@
 
 from abc import abstractproperty
 
-from cloudshell.cli.cli import CLI
-from cloudshell.cli.cli_service_impl import CommandModeContextManager
-from cloudshell.cli.command_mode import CommandMode
 from cloudshell.cli.session.ssh_session import SSHSession
 from cloudshell.cli.session.telnet_session import TelnetSession
+
 from cloudshell.devices.cli_handler_interface import CliHandlerInterface
 
 
