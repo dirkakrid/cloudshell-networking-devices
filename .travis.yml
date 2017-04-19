@@ -8,7 +8,7 @@ install:
 
 script:
     - python setup.py develop
-    - nosetests --with-coverage --cover-package=cloudshell
+    - nosetests --with-coverage --cover-package cloudshell/devices
 
 after_success:
     - coveralls
