@@ -1,7 +1,6 @@
 ipcalc==1.1.3
 jsonpickle==0.9.3
 cloudshell-cli>=3.1,<3.2
-cloudshell-snmp>=3.0,<3.1
 cloudshell-automation-api>=7.0,<7.1
 -e git+https://github.com/QualiSystems/cloudshell-shell-core.git@feature/apiddubny_bug_154034_general_messages_needs_to_be_revised#egg=cloudshell-shell-core
 -e git+https://github.com/QualiSystems/cloudshell-snmp.git@feature/apiddubny_bug_154034_general_messages_needs_to_be_revised#egg=cloudshell-snmp
