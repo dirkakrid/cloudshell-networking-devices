@@ -21,6 +21,22 @@ class TestCliHandlerImpl(unittest.TestCase):
                                        logger=self.logger,
                                        api=self.api)
 
+
+
+        self.tested_class = TestedClass
+
+    def test_abstract_methods(self):
+        """Check that instance can't be instantiated without implementation of all abstract methods"""
+        class TestedClass(CliHandlerImpl):
+            pass
+
+        with self.assertRaisesRegexp(TypeError, "Can't instantiate abstract class TestedClass with "
+                                                "abstract methods config_mode, enable_mode"):
+            TestedClass(cli=self.cli,
+                        resource_config=self.config,
+                        logger=self.logger,
+                        api=self.api)
+
     def test_username(self):
         """Check "username" property"""
         # act

@@ -60,7 +60,6 @@ class ConnectivityRunner(ConnectivityOperationsInterface):
         :return Serialized DriverResponseRoot to json
         :rtype json
         """
-
         if request is None or request == "":
             raise Exception(self.__class__.__name__, "request is None or empty")
 
