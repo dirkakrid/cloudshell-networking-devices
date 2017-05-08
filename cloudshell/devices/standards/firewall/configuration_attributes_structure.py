@@ -188,6 +188,13 @@ class GenericFirewallResource(object):
         """
         return self.attributes.get("{}CLI TCP Port".format(self.namespace_prefix), None)
 
+    @property
+    def vrf_management_name(self):
+        """
+        :rtype: str
+        """
+        return self.attributes.get("{}VRF Management Name".format(self.namespace_prefix), None)
+
 
 def create_firewall_resource_from_context(shell_name, supported_os, context):
     """
