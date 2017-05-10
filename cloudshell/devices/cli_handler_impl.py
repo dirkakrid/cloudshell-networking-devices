@@ -26,6 +26,7 @@ class CliHandlerImpl(CliHandlerInterface):
         self.resource_config = resource_config
         self._logger = logger
         self._api = api
+        self._password = None
 
     @abstractproperty
     def enable_mode(self):
@@ -41,8 +42,10 @@ class CliHandlerImpl(CliHandlerInterface):
 
     @property
     def password(self):
-        password = self.resource_config.password
-        return self._api.DecryptPassword(password).Value
+        if not self._password:
+            password = self.resource_config.password
+            self._password = self._api.DecryptPassword(password).Value
+        return self._password
 
     @property
     def resource_address(self):

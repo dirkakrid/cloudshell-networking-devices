@@ -15,7 +15,7 @@ class FirmwareRunner(FirmwareRunnerInterface):
         :param qs_logger logger: logger
         """
         self._logger = logger
-        self._timeout = 500
+        self._timeout = 3600
 
     @abstractproperty
     def cli_handler(self):
